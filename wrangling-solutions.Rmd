@@ -25,15 +25,16 @@ library(learnr)
 
 This is the third in a series of five exercises that constitute _Training Module 1: Introduction to Scientific Programming_, taught through the IDEAS PhD program at the University of Georgia Odum School of Ecology in conjunction with the Center for the Ecology of Infectious Diseases. 
 
-This exercise explores methods of data wrangling, which is essentially the good practices associated with storing and manipulating data. This module uses the following libraries:
+This exercise explores methods of data wrangling, which is essentially the good practices associated with storing and manipulating data. This module uses the libraries `tidyverse` and `magrittr`. Load these libraries.
 
-```{r libLoad, echo=T, message=FALSE, warning=FALSE}
+```{r libLoad, exercise=TRUE, exercise.eval=TRUE, message=FALSE, warning=FALSE}
+
+```
+
+
+```{r libLoad-solution}
 library(tidyverse)
 library(magrittr)
-library(GGally)
-library(maptools)
-library(ggmap)
-library(maps)
 ```
 
 ## Case study
@@ -64,18 +65,16 @@ The PRISM data for total rainfall and average temperature, is available for over
 
 *Task 1: Read in all three csv files as tibble data frames. For consistency, we'll assign their dataframes to be called "ld", "pop" and "prism", resectively.*
 
-```{r readData, exercise=TRUE, exercise.eval=FALSE}
+```{r readData, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
 
 ```
 
 ```{r readData-solution}
-ld <- read_csv("lyme.csv")
-pop <- read_csv("pop.csv")
-prism <- read_csv("climate.csv")
+pop <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/pop.csv")
 ```
 
 
-## Converting data to the `tidy data` format
+## The `tidy data` format
 
 Currently, only the PRISM data conforms to the concept of `tidy data`:
 
@@ -93,25 +92,112 @@ You'll note that there is a column called `fips`. This is a number that uniquely
 
 *Task 2: By inspecting the 'pop' data, and talking with your neighbors and instructors, articulate in which way(s) these data fail to conform to the `tidy data` format?*
 
-The following code chunk manipulates the `pop` data frame to the `tidy data` format, and does one or two other useful things along the way. It uses three functions from the `dplyr` package: _select_, _gather_, and _mutate_. In addition, it uses `str_replace_all`, which is a function of the `stringr` packages that replaces characters (text) with other characters. The basic call is
-
-`str_replace_all(x,y,z)`
-
-where `x` is where R should look to perform these replacements, `y` is the pattern to be replaced, and `z` is the replacing pattern. The syntax to identify/find character strings is known as `regexp` language (short for _regular expression_). It's beyond the scope of this workshop to learn the language in full, but you'll note that the code chunk below can remove text by replacing a string with "". It also finds characters that begin with "0" by using "^0" (here the ^ means 'start of character string'). 
-
-*Task 3: Before running the code, read it to see if you can work out or guess what each line is doing. Before running a line of code, remind yourself of the current format of `pop` by typing it's name in the console window and hitting return. Then run each line, one by one, and after each line has been executed, look again at `pop` to see what it did. Once you're clear about what each line is doing, add a comment line above each code line to remind you, in your own words, what the code does.*
-
-```{r,warning=FALSE, eval=F}
-pop %<>% select(fips,starts_with("pop2"))
-pop %<>% gather(starts_with("pop2"),key="str_year",value="size") %>% na.omit
-pop %<>% mutate(year=str_replace_all(str_year,"pop",""))
-pop %<>% mutate(year=as.integer(year))
-pop %<>% mutate(fips=str_replace_all(fips,"^0",""))
-pop %<>% mutate(fips=as.integer(fips))
+```{r inspectPop-setup}
+library(tidyverse)
+library(magrittr)
+pop <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/pop.csv")
 ```
 
-The code is now in `tidy data` format. Arguably we could remove state-wide population summaries too, but we can do that when we combine data sets (*How would you do remove state-wide summaries at this stage?*). Also we could remove the character column 'str_year' now that we've converted year to integer (*How would you do this?*), but it may be useful to retain it.
+
+```{r inspectPop, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+```{r inspectPop-solution}
+pop
+```
+
+
+## Methods to manipulate data
+
+Common to many data wrangling solutions, we will use functions from the `dplyr` package: _select_, _gather_, and _mutate_. In addition, we'll use `str_replace_all`, which is a function of the `stringr` packages that replaces characters (text) with other characters.The basic call is `str_replace_all(x,y,z)` where `x` is where R should look to perform these replacements, `y` is the pattern to be replaced, and `z` is the replacing pattern.
+
+### Testing the use of `str_replace_all`
+
+```{r testStrRepAll-setup, echo=F}
+library(tidyverse)
+library(magrittr)
+pets <- tibble(human=c("Abby","Ben","Chiara"),animalType=c("Fish","Dag","Harse"),animalName=c("Daisy","Alan","Hoofy"))
+```
+
+
+```{r displayPets, exercise=TRUE, exercise.setup="testStrRepAll-setup", waring=F, message=F}
+pets
+```
+
+Run the code above to inspect the dataframe `pets`, and then write a line of code that pipes the dataframe to a `mutate` function to correct the spelling in the `animalType` column. Then inspect the dataframe again to check you fixed things.
+
+```{r testStrRepAll, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+```{r testStrRepAll-solution}
+pets %<>% mutate(animalType = str_replace_all(animalType,"a","o"))
+pets
+```
+
+
+### After each task below, be sure to add `pop` as the final line of code so you can see how the dataframe is evolving as you manipulate it. 
+
+*Task 3: Streamline the `pop` dataframe using `select` so that we only retain the `fips` coloumn and all columns that start with "pop2".*
+
+```{r streamlinePop, exercise=TRUE, exercise.setup="inspectPop-setup"}
+
+```
+
+```{r streamlinePop-solution}
+pop %<>% select(fips,starts_with("pop2"))
+pop
+```
+
+```{r streamlinePop-hint-1}
+pop %<>% select()
+```
+
+```{r streamlinePop-hint-2}
+pop %<>% select(starts_with(...))
+```
+
+
+*Task 4: Use the `gather` function to collect columns starting "pop2" into two columns, where the `key` is "year" and the `value` is size. As a final part of the pipeline, remove rows with `NA` values.*
+
+```{r gatherPop-setup}
+library(tidyverse)
+library(magrittr)
+pop <- read_csv("")
+```
+
+
+```{r gatherPop}
+
+```
 
 
 
+```{r gatherPop-solution}
+pop %<>% gather(starts_with("pop2"),key="year",value="size") %>% na.omit
+```
 
+
+*Task 5: Use the `gather` function to collect columns starting "pop2" into two columns, where the `key` is "year" and the `value` is size. As a final part of the pipeline, remove rows with `NA` values.*
+
+```{r wrangleYearColumn}
+
+```
+
+
+```{r wrangleYearColumn-solution}
+pop %<>% mutate(year=str_replace_all(year,"pop","")) %>% mutate(year=as.integer(year))
+```
+
+*Task 6: For later tasks, we require that the fips column doesn't have data that starts with a zero, and is integer data. To see how to do this, click the solution button, then run this code (and again add `pop` as the final line of code to see your final results).*
+
+```{r wrangleFipsColumn}
+
+```
+
+```{r wrangleFipsColumn-solution}
+pop %<>% mutate(fips=str_replace_all(fips,"^0","")) %>% mutate(fips=as.integer(fips))
+```
+
+The code is now in `tidy data` format. Great job!
