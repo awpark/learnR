@@ -1,0 +1,80 @@
+---
+title: "1. Introduction to data types"
+author: "Andrew W. Park"
+output:
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(learnr)
+library(tidyverse)
+library(magrittr)
+```
+
+## Assigning data
+
+Data come in a variety of types: for example numbers and words. First, we'll develop a repertoire of common data types before thinking about how best to organize our data. We can store data by assigning it to a variable name using the assignment operator `<-`. Modify the code so that the number `2` is assigned to the variable `a`. Then on the next line ask R to add the number `3` to `a` to check we assigned the data correctly.
+
+```{r assignNum, exercise=TRUE, exercise.eval=FALSE}
+2
+```
+
+```{r assignNum-solution}
+a <- 2
+a + 3
+```
+
+<div id="filter-hint">
+**Hint:** Start with the variable name, then the operator, then the data to be assigned.
+</div>
+
+###
+
+## Simple manipulation of numeric data
+
+We can add, remove and modify data as well as apply built-in functions appropriate to a data type. To store more than one element of the same data type in a variable name, the simplest is to the use the `combine` function, which is called using just the letter `c`. We refer to these data as vectors. Here we're combine what the numbers `3` and `1` with what we already had stored in `a`, and storing the result in `b`
+
+```{r extendVectorExample, exercise=TRUE, exercise.eval=TRUE}
+b <- c(a,3,1)
+```
+
+Try introducing a new element, the number `4`, to the vector b. On the next line, ask R to return b.
+
+```{r extendVector1, exercise=TRUE, exercise.eval=FALSE}
+
+```
+
+
+```{r extendVector1-solution}
+b <- c(b,4)
+b
+```
+
+We can apply built-in functions to a vector of data, for example the `sum`.
+
+```{r sumExample, exercise=TRUE, exercise.eval=FALSE}
+sum(b)
+```
+
+
+###
+
+
+## Simple manipulation of text data
+
+Not all data is numeric. The most common other data type is text. In R this is referred to as `character` data. 
+
+```{r}
+days <- c("Monday", "Tuesday", "Wednesday")
+```
+
+
+
+
+
+
+
