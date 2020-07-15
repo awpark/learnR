@@ -223,7 +223,7 @@ The code is now in `tidy data` format. Great job!
 
 ## Methods to manipulate disease data
 
-The disease data can be converted to `tidy data` format in a similar way. In addition to methods described above, we'll also write a function to help us generate consistent fips codes in the disease data set. 
+The disease data can be converted to `tidy data` format in a similar way. In addition to methods described above, we'll also write a function to help us generate consistent FIPS codes in the disease data set. 
 
 *Task 7: First, read in the lyme.csv file as a tibble data frame. For consistency, we'll assign this dataframe to be called "ld" (for Lyme disease). The file is located on github at https://raw.githubusercontent.com/awpark/learnR/master/lyme.csv*
 
@@ -291,7 +291,7 @@ respectively (this is useful for a later `join` operation).*
 ```{r renameLdStCt-setup, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(magrittr)
-ld <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ld9-10.csv")
+ld <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ld9_10.csv")
 ```
 
 
@@ -305,3 +305,54 @@ ld %<>% rename(state=STNAME,county=CTYNAME)
 ld
 ```
 
+
+We need to build a full FIPS code for each county using the state FIPS (column 'STCODE') and the county FIPS (column 'CTYCODE'). The key R function we need is `paste`. However, currently the county FIPS is either a 1, 2, or 3-digit number, whereas we require them all to be 3-digit numbers (padding at the beginning with the appropriate amount of zeros - e.g., "3" should be "003" and "13" should be "013"). 
+
+*Task 11: Write a function called 'fips.builder' which takes two arguments (a state FIPS and a county FIPS) and returns a full FIPS code. The function should use the `if`-`else-if`-`else` construction to deal with the three possible lenths of the county FIPS. The length of a string can be obtained using `str_length` function, and two strings can be combined using the `paste` function, where you'll want to identify the separator as `sep=""` we don't have a space (or other character) between the state and county FIPS.*
+
+```{r fipsFunction-setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+ld <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ld10_11.csv")
+```
+
+```{r fipsFunction, exercise=TRUE, message=FALSE, warning=FALSE}
+
+```
+
+```{r fipsFunction-solution, echo=FALSE}
+fips.builder<-function(st,ct){
+  if (str_length(ct)==3){
+    fips<-paste(as.character(st),as.character(ct),sep="") %>% as.integer
+  }
+  else if (str_length(ct)==2){
+    fips<-paste(as.character(st),"0",as.character(ct),sep="") %>% as.integer
+  }
+  else {
+    fips<-paste(as.character(st),"00",as.character(ct),sep="") %>% as.integer
+  }
+  return(fips)
+}
+```
+
+
+```{r fipsFunction-hint-1}
+fips.builder<-function(st,ct){
+  ...
+}
+```
+
+```{r fipsFunction-hint-2}
+fips.builder<-function(st,ct){
+  if (str_length(ct)==3){
+    fips<-paste(as.character(st),as.character(ct),sep="") %>% as.integer
+  }
+  else if (str_length(ct)==2){
+    fips<-paste(as.character(st),"0",as.character(ct),sep="") %>% as.integer
+  }
+  else {
+    fips<-paste(as.character(st),"00",as.character(ct),sep="") %>% as.integer
+  }
+  return(fips)
+}
+```
