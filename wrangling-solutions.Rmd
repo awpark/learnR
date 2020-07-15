@@ -63,7 +63,12 @@ Similarly, the Census U.S. Intercensal County Population Data, 1970-2014 (also p
 
 The PRISM data for total rainfall and average temperature, is available for overlapping years, 2000-2015 (http://www.prism.oregonstate.edu/). Please note: your instructors have obtained and formatted this data from PRISM in advance, as it involves some time consuming steps that are beyond the scope of this workshop (please ask in a break if you're interested in learning about this).
 
-*Task 1: Read in all three csv files as tibble data frames. For consistency, we'll assign their dataframes to be called "ld", "pop" and "prism", resectively.*
+*Task 1: Read in the pop.csv file as a tibble data frame. For consistency, we'll assign this dataframe to be called "pop". The file is located on github at https://raw.githubusercontent.com/awpark/learnR/master/pop.csv*
+
+```{r readData-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+```
+
 
 ```{r readData, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
 
@@ -86,13 +91,11 @@ This is a highly recommended format to store data, and you can read more about w
 
 ### A note about FIPS codes
 
-You'll note that there is a column called `fips`. This is a number that uniquely defines a county in the US. The first 1 or 2 digits refer to the state (e.g. 6=California, 13=Georgia). The following 1-3 digits identify the counties of that state, numbered in alphabetical order, usually using only odd numbers (e.g. 59 is Clarke county, where we are now). The full FIPS code for Clarke county is 13059 (we 'pad' the county code with zeros to ensure it is three digits in total - but we don't do that with states, which can be 1 or 2 digits). The format may seem a little quirky, but the system works very well in uniquely identifying counties in the US and is one of the common ways that infectious disease, climate and demographic data are organized in this country. 
-
-### Worked example: Census data `pop`
+In this exercise, data is organized at the county level for the US. You'll note that there is a column called `fips`. This is a number that uniquely defines a county in the US. The first 1 or 2 digits refer to the state (e.g. 6=California, 13=Georgia). The following 1-3 digits identify the counties of that state, numbered in alphabetical order, usually using only odd numbers (e.g. 59 is Clarke county, Georgia, where UGA has its main campus). The full FIPS code for Clarke county is 13059 (we 'pad' the county code with zeros to ensure it is always three digits in total - but we don't do that with states, which can be 1 or 2 digits). The format may seem a little quirky, but the system works very well in uniquely identifying counties in the US and is one of the common ways that infectious disease, climate and demographic data are organized in the US. 
 
 *Task 2: By inspecting the 'pop' data, and talking with your neighbors and instructors, articulate in which way(s) these data fail to conform to the `tidy data` format?*
 
-```{r inspectPop-setup}
+```{r inspectPop-setup, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(magrittr)
 pop <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/pop.csv")
@@ -108,9 +111,9 @@ pop
 ```
 
 
-## Methods to manipulate data
+## Methods to manipulate census data
 
-Common to many data wrangling solutions, we will use functions from the `dplyr` package: _select_, _gather_, and _mutate_. In addition, we'll use `str_replace_all`, which is a function of the `stringr` packages that replaces characters (text) with other characters.The basic call is `str_replace_all(x,y,z)` where `x` is where R should look to perform these replacements, `y` is the pattern to be replaced, and `z` is the replacing pattern.
+Common to many data wrangling solutions, we will use functions from the `dplyr` package: _select_, _gather_, and _mutate_. In addition, we'll use `str_replace_all`, which is a function of the `stringr` package that replaces characters (text) with other characters. The basic call is `str_replace_all(x,y,z)` where `x` is where R should look to perform these replacements, `y` is the pattern to be replaced, and `z` is the replacing pattern.
 
 ### Testing the use of `str_replace_all`
 
@@ -139,9 +142,9 @@ pets
 
 ### After each task below, be sure to add `pop` as the final line of code so you can see how the dataframe is evolving as you manipulate it. 
 
-*Task 3: Streamline the `pop` dataframe using `select` so that we only retain the `fips` coloumn and all columns that start with "pop2".*
+*Task 3: Streamline the `pop` dataframe using `select` so that we only retain the `fips` column and all columns that start with "pop2".*
 
-```{r streamlinePop, exercise=TRUE, exercise.setup="inspectPop-setup"}
+```{r streamlinePop, exercise=TRUE, exercise.setup="inspectPop-setup", message=FALSE, warning=FALSE}
 
 ```
 
@@ -159,45 +162,106 @@ pop %<>% select(starts_with(...))
 ```
 
 
-*Task 4: Use the `gather` function to collect columns starting "pop2" into two columns, where the `key` is "year" and the `value` is size. As a final part of the pipeline, remove rows with `NA` values.*
+*Task 4: Use the `gather` function to collect columns starting "pop2" into two columns, where the `key` is "year" and the `value` is "size". As a final part of the pipeline, remove rows with `NA` values.*
 
-```{r gatherPop-setup}
+```{r gatherPop-setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(magrittr)
-pop <- read_csv("")
+pop <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/pop3_4.csv")
 ```
 
 
-```{r gatherPop}
+```{r gatherPop, exercise=TRUE, message=FALSE, warning=FALSE}
 
 ```
 
 
 
-```{r gatherPop-solution}
+```{r gatherPop-solution, echo=FALSE}
 pop %<>% gather(starts_with("pop2"),key="year",value="size") %>% na.omit
+pop
 ```
 
 
-*Task 5: Use the `gather` function to collect columns starting "pop2" into two columns, where the `key` is "year" and the `value` is size. As a final part of the pipeline, remove rows with `NA` values.*
+*Task 5: Use `gather`, `str_replace_all`, and `as.integer` to change cells in the year column from, for example, the character "pop2001" to the integer "2001".*
 
-```{r wrangleYearColumn}
+```{r wrangleYearColumn-setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+pop <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/pop4_5.csv")
+```
+
+
+```{r wrangleYearColumn, exercise=TRUE, message=FALSE, warning=FALSE}
 
 ```
 
 
-```{r wrangleYearColumn-solution}
+```{r wrangleYearColumn-solution, echo=FALSE}
 pop %<>% mutate(year=str_replace_all(year,"pop","")) %>% mutate(year=as.integer(year))
+pop
 ```
 
 *Task 6: For later tasks, we require that the fips column doesn't have data that starts with a zero, and is integer data. To see how to do this, click the solution button, then run this code (and again add `pop` as the final line of code to see your final results).*
 
-```{r wrangleFipsColumn}
+```{r wrangleFipsColumn-setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+pop <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/pop5_6.csv")
+```
+
+```{r wrangleFipsColumn, exercise=TRUE, message=FALSE, warning=FALSE}
 
 ```
 
-```{r wrangleFipsColumn-solution}
+```{r wrangleFipsColumn-solution, echo=FALSE}
 pop %<>% mutate(fips=str_replace_all(fips,"^0","")) %>% mutate(fips=as.integer(fips))
+pop
 ```
 
 The code is now in `tidy data` format. Great job!
+
+## Methods to manipulate disease data
+
+The disease data can be converted to `tidy data` format in a similar way. In addition to methods described above, we'll also write a function to help us generate consistent fips codes in the disease data set. 
+
+*Task 7: First, read in the lyme.csv file as a tibble data frame. For consistency, we'll assign this dataframe to be called "ld" (for Lyme disease). The file is located on github at https://raw.githubusercontent.com/awpark/learnR/master/lyme.csv*
+
+### After each task, be sure to add `ld` as the final line of code so you can see how the dataframe is evolving as you manipulate it. 
+
+```{r readData2-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+```
+
+
+```{r readData2, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+```{r readData2-solution}
+ld <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/lyme.csv")
+ld
+```
+
+By exploring this dataframe, you should recognize that it is not in `tidy data` format.
+
+*Task 8: Use the `gather` function to collect columns starting "Cases" into two columns, where the `key` is "year" and the `value` is "cases". As a final part of the pipeline, remove rows with `NA` values.*
+
+```{r gatherLd-setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+pop <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ld7-8.csv")
+```
+
+
+```{r gatherLd, exercise=TRUE, message=FALSE, warning=FALSE}
+
+```
+
+
+
+```{r gatherLd-solution, echo=FALSE}
+ld %<>% gather(starts_with("Cases"),key="year",value="cases") %>% na.omit
+ld
+```
+
