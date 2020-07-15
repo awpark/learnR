@@ -308,12 +308,11 @@ ld
 
 We need to build a full FIPS code for each county using the state FIPS (column 'STCODE') and the county FIPS (column 'CTYCODE'). The key R function we need is `paste`. However, currently the county FIPS is either a 1, 2, or 3-digit number, whereas we require them all to be 3-digit numbers (padding at the beginning with the appropriate amount of zeros - e.g., "3" should be "003" and "13" should be "013"). 
 
-*Task 11: Write a function called 'fips.builder' which takes two arguments (a state FIPS and a county FIPS) and returns a full FIPS code. The function should use the `if`-`else-if`-`else` construction to deal with the three possible lenths of the county FIPS. The length of a string can be obtained using `str_length` function, and two strings can be combined using the `paste` function, where you'll want to identify the separator as `sep=""` we don't have a space (or other character) between the state and county FIPS.*
+*Task 11: Write a function called 'fips.builder' which takes two arguments (a state FIPS and a county FIPS) and returns a full FIPS code. The function should use the `if`-`else-if`-`else` construction to deal with the three possible lengths of the county FIPS. The length of a string can be obtained using the `str_length` function, and two strings can be combined using the `paste` function, where you'll want to identify the separator as `sep=""` so that we don't have a space (or other character) between the state and county FIPS.*
 
 ```{r fipsFunction-setup, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(magrittr)
-ld <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ld10_11.csv")
 ```
 
 ```{r fipsFunction, exercise=TRUE, message=FALSE, warning=FALSE}
@@ -348,11 +347,14 @@ fips.builder<-function(st,ct){
     fips<-paste(as.character(st),as.character(ct),sep="") %>% as.integer
   }
   else if (str_length(ct)==2){
-    fips<-paste(as.character(st),"0",as.character(ct),sep="") %>% as.integer
+    ...
   }
   else {
-    fips<-paste(as.character(st),"00",as.character(ct),sep="") %>% as.integer
+    ...
   }
   return(fips)
 }
 ```
+
+
+*Task 12: Apply your function 'fips.builder' to the 'ld' dataframe. Note that you'll need to add `rowwise()` in the pipe before you use the function
