@@ -283,3 +283,25 @@ ld <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ld8-9.csv
 ld %<>% mutate(year=str_replace_all(year,"Cases","")) %>% mutate(year=as.integer(year))
 ld
 ```
+
+*Task 10: Using `rename`, change the columns 'STNAME' and 'CTYNAME' to 'state' and 'county',
+respectively (this is useful for a later `join` operation).*
+
+
+```{r renameLdStCt-setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+ld <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ld9-10.csv")
+```
+
+
+```{r renameLdStCt, exercise=TRUE, message=FALSE, warning=FALSE}
+
+```
+
+
+```{r renameLdStCt-solution, echo=FALSE}
+ld %<>% rename(state=STNAME,county=CTYNAME)
+ld
+```
+
