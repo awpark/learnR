@@ -411,7 +411,7 @@ ld
 Great job! The disease data is in tidy format and we're ready to join all three data sets (climate, demography, disease) together.
 
 
-## Combining dataframes using join functions
+## Joining dataframes
 
 We will use the `inner_join` function (part of tidyverse) to join pairs of dataframes together. This function will only retain lines of data provided *both* dataframes have data for that line (there are other join functions for other cases). In our case a unique line of data refers to a unique combination of county (identified by 'fips') and year. We'll first join the two dataframes you've created, then we'll join the climate data. In principle, you can nominate which columns should be used to match up the dataframes. If we omit that step, R will just use all columns that are in common between the two dataframes being joined. Our dataframes only have 'fips' and 'year' as the common column names, so we don't need to nominate columns. 
 
@@ -451,3 +451,14 @@ clim <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/climate
 ld.pop.clim <- inner_join(ld.pop,clim)
 ld.pop.clim
 ```
+
+Great job! Now, for every county (identified by name and by FIPS) in each year you have the the number of Lyme disease cases ("cases"), the human population size ("size"), the total rainfall ("prcp"), and the average temperature ("avtemp").
+
+
+## Obtaining summary information
+
+We may want to obtain an overview of a large dataframe. For this purpose, we’ll use the `summarize` function
+of the `dplyr` package.
+
+
+
