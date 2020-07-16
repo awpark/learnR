@@ -357,4 +357,78 @@ fips.builder<-function(st,ct){
 ```
 
 
-*Task 12: Apply your function 'fips.builder' to the 'ld' dataframe. Note that you'll need to add `rowwise()` in the pipe before you use the function
+*Task 12: Apply your function 'fips.builder' to the 'ld' dataframe to create a new column called 'fips' which is the entire 4 or 5-digit FIPS code for each county. Note that you'll need to add `rowwise()` in the pipe before you use the function, so that it is applied separately to each line of data. This means the operation takes several seconds to complete.*
+
+```{r applyFipsBuilder-setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+ld <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ld10_11.csv")
+fips.builder<-function(st,ct){
+  if (str_length(ct)==3){
+    fips<-paste(as.character(st),as.character(ct),sep="") %>% as.integer
+  }
+  else if (str_length(ct)==2){
+    fips<-paste(as.character(st),"0",as.character(ct),sep="") %>% as.integer
+  }
+  else {
+    fips<-paste(as.character(st),"00",as.character(ct),sep="") %>% as.integer
+  }
+  return(fips)
+}
+```
+
+
+```{r applyFipsBuilder, exercise=TRUE, message=FALSE, warning=FALSE}
+
+```
+
+
+```{r applyFipsBuilder-solution, echo=FALSE}
+ld %<>% rowwise() %>% mutate(fips=fips.builder(STCODE,CTYCODE))
+ld
+```
+
+*Task 13: Now you can remove extraneous columns 'STCODE' and 'CTYCODE', which is done using `select` with a minus sign to indicate 'keep all columns except the named ones'. *
+
+```{r removeStcodeCtycode-setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+ld <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ld12_13.csv")
+
+```
+
+
+```{r removeStcodeCtycode, exercise=TRUE, message=FALSE, warning=FALSE}
+
+```
+
+
+```{r removeStcodeCtycode-solution, echo=FALSE}
+ld %<>% select(-c(STCODE,CTYCODE))
+ld
+```
+
+Great job! The disease data is in tidy format and we're ready to join all three data sets (climate, demography, disease) together.
+
+
+## Combining dataframes using join functions
+
+We will use the `inner_join` function (part of tidyverse) to join pairs of dataframes together. This function will only retain lines of data provided *both* dataframes have data for that line (there are other join functions for other cases). In our case a unique line of data refers to a unique combination of county (identified by 'fips') and year. We'll first join the two dataframes you've created, then we'll join the climate data. In principle, you can nominate which columns should be used to match up the dataframes. If we omit that step, R will just use all columns that are in common between the two dataframes being joined. Our dataframes only have 'fips' and 'year' as the common column names, so we don't need to nominate columns. 
+
+*Task 14: Use `inner_join` to create a new dataframe called 'ld.pop' which joins the 'ld' and 'pop' dataframes you created.*
+
+```{r joinLdPop-setup}
+library(tidyverse)
+library(magrittr)
+ld <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ld_final.csv")
+pop <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/pop_final.csv")
+```
+
+```{r joinLdPop, exercise=TRUE, message=FALSE, warning=FALSE}
+
+```
+
+```{r joinLdPop-solution, echo=FALSE}
+ld.pop <- inner_join(ld,pop)
+```
+
