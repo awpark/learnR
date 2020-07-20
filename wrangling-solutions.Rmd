@@ -109,6 +109,7 @@ library(tidyverse)
 library(magrittr)
 pop <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/pop.csv")
 pop.GA <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/popGA.csv")
+pop2 <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/pop2.csv")
 ```
 
 
