@@ -15,15 +15,24 @@ library(learnr)
 
 ## Learning outcomes
 
-1. Reading in data
+1. Recognize and explain keywords used in data wrangling, including `gather`, `mutate`, `select`, `summarize`
 
-2. "Tidy" data
+2. Perform preparatory tasks using `library` and `read_csv`
 
-3. Piping and applying functions to rows
+3. Contrast data sets that are and are not in 'tidy' format
+
+4. Complete and solve coding challenges related to data wrangling
+
+5. Modify code presented to help with your own projects
+
+6. Plan steps for your own work using a scaffold of comment lines
 
 ## Introduction
 
 This is the third in a series of five exercises that constitute _Training Module 1: Introduction to Scientific Programming_, taught through the IDEAS PhD program at the University of Georgia Odum School of Ecology in conjunction with the Center for the Ecology of Infectious Diseases. 
+
+If coding in R is relatively new to you, you may find it helpful to first watch this introductory video that introduces ideas we'll be using
+![](https://youtu.be/yGrsbtAmUmI)
 
 This exercise explores methods of data wrangling, which is essentially the good practices associated with storing and manipulating data. This module uses the libraries `tidyverse` and `magrittr`. Load these libraries.
 
@@ -99,6 +108,7 @@ In this exercise, data is organized at the county level for the US. You'll note 
 library(tidyverse)
 library(magrittr)
 pop <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/pop.csv")
+pop.GA <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/popGA.csv")
 ```
 
 
@@ -417,7 +427,7 @@ We will use the `inner_join` function (part of tidyverse) to join pairs of dataf
 
 *Task 14: Use `inner_join` to create a new dataframe called 'ld.pop' which joins the 'ld' and 'pop' dataframes you created. Type 'ld.pop' to inspect this new data frame.*
 
-```{r joinLdPop-setup}
+```{r joinLdPop-setup, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(magrittr)
 ld <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ld_final.csv")
@@ -436,7 +446,7 @@ ld.pop
 
 *Task 15: To create the finalized dataframe, read in the climate data (located at "https://raw.githubusercontent.com/awpark/learnR/master/climate.csv") as 'clim' and join this with 'ld.pop' to make a new data frame 'ld.pop.clim', and inspect this new dataframe.*
 
-```{r joinClim-setup}
+```{r joinClim-setup, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(magrittr)
 ld.pop <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ldPop.csv")
@@ -458,7 +468,59 @@ Great job! Now, for every county (identified by name and by FIPS) in each year y
 ## Obtaining summary information
 
 We may want to obtain an overview of a large dataframe. For this purpose, we’ll use the `summarize` function
-of the `dplyr` package.
+of the `dplyr` package. This is typically used with the `group_by` function.
 
+*Task 16: Pass the 'ld' dataframe through a pipe, group by 'year' and use `summarize` to create a column called 'total' that represents all the Lyme disease cases reported that year. Identify the year with the largest number of cases. Note you can further pass your analysis through a pipe to `arrange` the data in some order. To go from highest to lowest cases, the order would be 'desc(total)', i.e., using 'total' in **desc**ending order (largest first).*
 
+```{r summarizeEx-setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+ld <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ld_final.csv")
+```
 
+```{r summarizeEx, exercise=TRUE, message=FALSE, warning=FALSE}
+
+```
+
+```{r summarizeEx-solution, echo=FALSE}
+ld %>% group_by(year) %>% summarize(total=sum(cases)) %>% arrange(desc(total))
+```
+
+## Mapping data
+
+R has ever-increasing capabilities to produce high-quality maps and sophisticated geographical data analysis. For an introductory scientific programming workshop we can’t go into all those details - but we can illustrate some simple mapping ideas that can help us understand and visualize our spatial data. `ggplot` has US mapping objects that we can take advantage of.
+
+*Task 17: Read through the code and comment lines below and then run the code to produce a map. You'll note that most of this code is familiar to you already.*
+
+```{r map-setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+ld.pop.clim <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ldPopClim.csv")
+```
+
+```{r map, exercise=TRUE, message=FALSE, warning=FALSE}
+#get map data for US counties and states (part of ggplot)
+county_map <- map_data("county")
+state_map <- map_data("state")
+#to prepare data for plot, first group biological data by fips
+ag.fips <- group_by(ld.pop.clim,fips)
+#add all the cases that occur in a county over time (name chosen because it's a 16-year dataset)
+ld.16y <- summarize(ag.fips,all.cases=sum(cases))
+#add in the state and county names to each fips to match to geographical data
+ld.16y %<>% left_join(select(ld.pop.clim,c(state,county,fips)),.)
+ld.16y %<>% distinct(.)
+# rename state and county headers, and manipulate entries to match to geographical data
+ld.16y %<>% rename(region=state,subregion=county)
+ld.16y %<>% mutate(subregion=str_replace_all(subregion," County",""))
+ld.16y %<>% mutate(subregion=str_replace_all(subregion," Parish",""))
+ld.16y %<>% mutate(region=tolower(region),subregion=tolower(subregion))
+# add column where cases are expressed as log10
+ld.16y %<>% mutate(log10cases=log10(1+all.cases))
+# combine geographical and lyme data
+map.ld.16y<-left_join(county_map,ld.16y)
+# plot (note a handful of counties don't match - this is usually due to spelling differences such as st. & saint)
+ggplot(map.ld.16y)+geom_polygon(aes(long,lat,group=group,fill=log10cases),color="gray",lwd=0.2) +
+scale_fill_gradientn(colours=rev(heat.colors(10)))
+```
+
+You've come a long way in terms of wrangling data so that you can efficiently analyze and visualize its stories. Great job!
