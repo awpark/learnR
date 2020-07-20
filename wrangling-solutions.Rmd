@@ -100,7 +100,7 @@ This is a highly recommended format to store data, and you can read more about w
 
 ### A note about FIPS codes
 
-In this exercise, data is organized at the county level for the US. You'll note that there is a column called `fips`. This is a number that uniquely defines a county in the US. The first 1 or 2 digits refer to the state (e.g. 6=California, 13=Georgia). The following 1-3 digits identify the counties of that state, numbered in alphabetical order, usually using only odd numbers (e.g. 59 is Clarke county, Georgia, where UGA has its main campus). The full FIPS code for Clarke county is 13059 (we 'pad' the county code with zeros to ensure it is always three digits in total - but we don't do that with states, which can be 1 or 2 digits). The format may seem a little quirky, but the system works very well in uniquely identifying counties in the US and is one of the common ways that infectious disease, climate and demographic data are organized in the US. 
+In this exercise, data is organized at the county level for the US. You'll note that there is a column called `fips`. This is a number that uniquely defines a county in the US. In most common usages, the first 1 or 2 digits refer to the state (e.g. 6=California, 13=Georgia). The following 1-3 digits identify the counties of that state, numbered in alphabetical order, usually using only odd numbers (e.g. 59 is Clarke county, Georgia, where UGA has its main campus). The full FIPS code for Clarke county is 13059 (we 'pad' the county code with zeros to ensure it is always three digits in total - but we don't do that with states, which can be 1 or 2 digits). The format may seem a little quirky, but the system works very well in uniquely identifying counties in the US and is one of the common ways that infectious disease, climate and demographic data are organized in the US. 
 
 *Task 2: By inspecting the 'pop' data, and talking with your neighbors and instructors, articulate in which way(s) these data fail to conform to the `tidy data` format?*
 
@@ -108,8 +108,6 @@ In this exercise, data is organized at the county level for the US. You'll note 
 library(tidyverse)
 library(magrittr)
 pop <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/pop.csv")
-pop.GA <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/popGA.csv")
-pop2 <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/pop2.csv")
 ```
 
 
@@ -119,6 +117,8 @@ pop2 <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/pop2.cs
 
 ```{r inspectPop-solution}
 pop
+# not tidy data format because each row is not a single observation (rather, multiple years per county) and so the variable 'year' does not have its own column
+# note also that 4 digit fips codes are padded with a zero, which we change below to be consistent with later data frames
 ```
 
 
