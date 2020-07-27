@@ -1,0 +1,110 @@
+---
+title: "Data modeling"
+author: "Andrew W. Park"
+output:
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r, echo=F, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(learnr)
+```
+
+## Learning outcomes
+
+1. TBD
+
+
+## Introduction
+
+This is the fourth in a series of five exercises that constitute Training Module 1: Introduction to Scientific Programming, taught through the IDEAS PhD program at the University of Georgia Odum School of Ecology in conjunction with the Center for the Ecology of Infectious Diseases.
+
+This exercise explores methods for using modeling to shape our inquiry of data. It reaches back to previous modules that taught us about data manipulation, data visualization and functions. The term “modeling” covers a vast array of ideas and techniques. A single module is always going to be rather modest in scope. Here we are going to focus more on statistical modeling than on mechanistic modeling (e.g. linear model fitting, not SIR modeling). However, even here we have to limit the scope. We’re not really going to learn how to do statistical modeling (except very briefly). Rather, we’re going to learn good practices for having our tidy data integrate with statistical modeling to help us perform exploratory analysis (hypothesis generation, not hypothesis confirmation).
+
+## Case study
+
+We will continue to work with the Lyme disease/Climate/Demography dataset that you previously assembled. 
+
+*Task 1: We'll start by loading some libraries we'll need and reading in the data (which is now saved on github).*
+
+```{r libDataLoad, exercise=T, exercise.eval=TRUE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+library(GGally)
+ld.pop.clim <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ldPopClim.csv")
+```
+
+
+## Visual data inspection
+
+There isn't a one-size-fits-all approach for how best to visually inspect and summarize your data. It depends what kind of data we're looking at - and you already learned some good ideas in the visualization module. For quantitative data, such as climate, demographic and disease case data, we might be interested in knowing the range of data, which kinds of values are rare and common, and whether data are correlated with each other. One way to do this is all in one go is with the function `ggpairs`, part of the `GGally` package, which has a language that is based on `ggplot`. For a data frame 'df' where you're interested in numeric data columns $x$, $y$, and $z$, we issue the command `ggpairs(df,columns=c("x","y","z"))`. This will make a 3x3 plot (because we have 3 columns: $x$, $y$ and $z$). The main diagonals will display the density of the data (like a histogram, but continuous rather than binned). The lower triangle plots will show the correlation between each pair of data, and the upper triangle will report the correlation coefficient. The correlation coefficient is a number between -1 and +1, where numbers close to +1 (-1) indicate a strong positive (negative) correlation and numbers close to 0 indicate weak or no association. Note that `ggpairs` doesn't always display this way - it depends what kind of data you're visualizing.
+
+*Task 2: Use the `ggpairs` function to obtain a 4x4 summary plot of precipitation (prcp), average temperature (avtemp), population size (size), number of Lyme disease cases (cases). Note: it may take several seconds for this plot to appear as there are over 30,000 data points.*
+
+
+```{r dataCor-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+library(GGally)
+ld.pop.clim <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ldPopClim.csv")
+```
+
+
+```{r dataCor, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+```{r dataCor-solution}
+ggpairs(ld.pop.clim,columns=c("prcp","avtemp","size","cases"))
+```
+
+You'll note from the density plots on the diagonals, that the data columns 'size' and 'cases' are very clumped, with many low values and a few large values. These may be easier to visualize by transforming to a logarithmic scale.
+
+*Task 3: Create two new columns for log10(size) and log10(cases+1), called 'log.size' and 'log.cases', respectively, and substitute these for the original size and cases supplied when you recreate the `ggpairs` plot. Why do we add 1 to the number of cases?*
+
+
+```{r dataCor2-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+library(GGally)
+ld.pop.clim <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ldPopClim.csv")
+```
+
+
+```{r dataCor2, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+```{r dataCor2-solution}
+ld.pop.clim %<>% mutate(log.size=log10(size),log.cases=log10(cases+1))
+ggpairs(ld.pop.clim,columns=c("prcp","avtemp","log.size","log.cases"))
+# We add 1 to cases, because sometimes there are 0 cases and we can't take the log10 of 0
+```
+
+
+## A simple linear model
+
+Our `ggpairs` plot suggests that precipitation and average temperature are positively correlated with each other (perhaps not too surprising). Let's look at that for a random subset of the data (it's a bit easier to see that pattern when the data are thinned out).
+
+*Task 4: Using `set.seed(222)` for reproducibility, create a new data frame called 'lpc100' to be a random sample ($n$=100
+rows) of the full data frame and plot precipitation (x-axis) vs average temperature (y-axis). You can make use of the `dplyr` function `sample_n` and you should name your plot 'plot1' (`plot1 <- ggplot...`) so that you can add more layers to the plot later. To see the plot, just type `plot1` on a new line and run the code.*
+
+```{r thinData-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+ld.pop.clim <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ldPopClimLog.csv")
+```
+
+```{r thinData, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+```{r thinData-solution}
+set.seed(222)
+lpc100 <- ld.pop.clim %>% sample_n(100)
+plot1 <- ggplot(lpc100,aes(x=prcp,y=avtemp))+geom_point() 
+plot1
+```
