@@ -1,0 +1,12 @@
+name: wrangling-solutions
+title: wrangling-solutions
+username:
+account: andrew-park
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2354795
+bundleId: 3413113
+url: https://andrew-park.shinyapps.io/wrangling-solutions/
+when: 1595265865.92305
+asMultiple: FALSE
+asStatic: FALSE

@@ -15,12 +15,24 @@ library(learnr)
 
 ## Learning outcomes
 
-1. TBD
+1. Recognize and explain keywords used in data modeling, including `group_by`, `map`, `nest`, `unnest`
 
+2. Perform preparatory tasks including writing custom functions
+
+3. Organize data into grouped, nested structures
+
+4. Complete and solve coding challenges related to data modeling including with the `purrr` and `modelr` packages
+
+5. Modify code presented to help with your own projects
+
+6. Plan steps for your own work using a scaffold of comment lines
 
 ## Introduction
 
-This is the fourth in a series of five exercises that constitute Training Module 1: Introduction to Scientific Programming, taught through the IDEAS PhD program at the University of Georgia Odum School of Ecology in conjunction with the Center for the Ecology of Infectious Diseases.
+This is the fourth in a series of exercises that constitute _Training Module 1: Introduction to Scientific Programming_, taught through the IDEAS PhD program at the University of Georgia Odum School of Ecology in conjunction with the Center for the Ecology of Infectious Diseases. 
+
+If coding in R is relatively new to you, you may find it helpful to first watch this introductory video that introduces ideas we'll be using in this module
+![](https://youtu.be/2Cr4stwnXMI)
 
 This exercise explores methods for using modeling to shape our inquiry of data. It reaches back to previous modules that taught us about data manipulation, data visualization and functions. The term “modeling” covers a vast array of ideas and techniques. A single module is always going to be rather modest in scope. Here we are going to focus more on statistical modeling than on mechanistic modeling (e.g. linear model fitting, not SIR modeling). However, even here we have to limit the scope. We’re not really going to learn how to do statistical modeling (except very briefly). Rather, we’re going to learn good practices for having our tidy data integrate with statistical modeling to help us perform exploratory analysis (hypothesis generation, not hypothesis confirmation).
 
@@ -108,3 +120,427 @@ lpc100 <- ld.pop.clim %>% sample_n(100)
 plot1 <- ggplot(lpc100,aes(x=prcp,y=avtemp))+geom_point() 
 plot1
 ```
+
+
+We can add layers to a `ggplot` object using the '+' symbol (between the object and the new layer).
+
+*Task 5: Add the best straight line to the plot using the function `geom_smooth`.*
+
+```{r addLine-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+ld.pop.clim <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ldPopClimLog.csv")
+set.seed(222)
+lpc100 <- ld.pop.clim %>% sample_n(100)
+plot1 <- ggplot(lpc100,aes(x=prcp,y=avtemp))+geom_point() 
+```
+
+```{r addLine, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+```{r addLine-solution}
+plot1 + geom_smooth(method="lm")
+```
+
+As well as visualizing the straight line fit, we can store the linear model in memory and get a summary. 
+
+*Task 6: Create a linear model (lm) object called model1 for the subsetted data, where the response variable is 'avtemp' and predictor variable is 'prcp'. In addition, view the `summary` of this model.*
+
+```{r makeLm-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+ld.pop.clim <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ldPopClimLog.csv")
+set.seed(222)
+lpc100 <- ld.pop.clim %>% sample_n(100)
+```
+
+```{r makeLm, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+```{r makeLm-solution}
+model1 <- lm(avtemp ~ prcp, data = lpc100)
+summary(model1)
+```
+
+```{r makeLm-hint-1}
+model1 <- lm(...)
+```
+
+```{r makeLm-hint-2}
+model1 <- lm(...)
+summary(...)
+```
+
+The summary presents us with information including a recap of the model we ran ('Call'), and details of the slope, intercept and significance of slope ('Coefficients'). We can extract information from this model object. The 'Coefficients' data appears as a table (2 rows, 4 columns) where the second row has information on the slope: particularly its value ('Estimate') and whether the slope is significantly different from a horizontal line ('Pr(>|t|)'). Based on [row,column] position, the slope 'estimate' is in position [2,1] of 'coefficients' and can be accessed directly
+
+```{r getSlope-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+ld.pop.clim <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ldPopClimLog.csv")
+set.seed(222)
+lpc100 <- ld.pop.clim %>% sample_n(100)
+model1 <- lm(avtemp ~ prcp, data = lpc100)
+```
+
+```{r getSlope, exercise=F, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+summary(model1)$coefficients[2,1]
+```
+
+
+*Task 7: Access the p-value for the slope in using the example above as a guide.*
+
+```{r getPval-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+ld.pop.clim <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ldPopClimLog.csv")
+set.seed(222)
+lpc100 <- ld.pop.clim %>% sample_n(100)
+model1 <- lm(avtemp ~ prcp, data = lpc100)
+```
+
+```{r getPval, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+```{r getPval-solution}
+summary(model1)$coefficients[2,4]
+```
+
+You've run, visualized and extracted information from a statistical model - and you'll use some of these ideas later. Great job!
+
+
+## Organizing data for (stats) modeling
+
+We'll start with an illustrative exercise. We know the size of the US population has been growing.
+
+*Task 8: Write a single line of code to generate a ggplot of total population size by year. Hint: you should pass the main (large) data frame 'ld.pop.clim' to a `group_by` call and then a `summarize` call, then you can pass this new, unnamed data frame to ggplot using `ggplot(.)` and specify the aesthetics in a `geom_point` call.*
+
+```{r USpop-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+ld.pop.clim <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ldPopClimLog.csv")
+```
+
+
+```{r USpop, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+```{r USpop-solution}
+ld.pop.clim %>% group_by(year) %>% summarize(total=sum(size)) %>% ggplot(.)+geom_point(aes(x=year,y=total))
+```
+
+While there is no doubt that the population has been growing in recent years, it's not clear if all states are contributing equally to this growth. Manipulating data to explore this has the potential to get quite cumbersome, but the `modelr` tools are designed to make this kind of task fairly painless.
+
+### Grouped data frames versus nested data frames
+
+We're going to create a nested data frame, which we do by first creating a grouped data frame (which you've already done in another context).
+
+*Task 9: Create a data frame called 'by.state' from the main data frame, that groups by state, and inspect it.*
+
+```{r gpByState-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+ld.pop.clim <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ldPopClimLog.csv")
+```
+
+
+```{r gpByState, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+```{r gpByState-solution}
+by.state <- ld.pop.clim %>% group_by(state)
+by.state
+```
+
+We can rest assured that the `group_by` call worked (as it has for us before) but we don't see any difference in the data frame itself. 
+
+*Task 10: Next, update this new data frame so that it is nested (simply pass it to nest). Again, inspect the data frame by typing its name in the console so see how things changed.*
+
+```{r nestByState-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+ld.pop.clim <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ldPopClimLog.csv")
+by.state <- ld.pop.clim %>% group_by(state)
+```
+
+```{r nestByState, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+
+```{r nestByState-solution}
+by.state %<>% nest
+by.state
+```
+
+
+You should see that by_state has a list-column called 'data'. List elements are accessed with [[]]. For example to see the data for Georgia, the 10th state in the alphabetized data frame, we would type 'by.state$data[[10]]' in the console.
+
+*Task 11: Display the Georgia data in the console window.*
+
+```{r displayGA-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+ld.pop.clim <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ldPopClimLog.csv")
+by.state <- ld.pop.clim %>% group_by(state) %>% nest
+```
+
+```{r displayGA, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+
+```{r displayGA-solution}
+by.state$data[[10]]
+```
+
+
+Hopefully you noticed that this particular element of the data frame is itself a dataframe! The containing column, which contains several such data frames differing in length due to the number of counties per state, is most usefully organized as a list - hence the column-list format. This method of organizing data comes in very useful for exploratory modeling, as we'll see. First we're going to create another function.
+
+*Task 12: Write a function called 'lm.size.yr' that takes a data frame 'df' as its argument and returns a linear model object that predicts 'size' by 'year'.*
+
+
+```{r lmFunc, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+
+```{r lmFunc-solution}
+lm.size.yr <- function(df){
+  lm(size ~ year, data = df)
+}
+```
+
+### The `purrr` package
+
+Next, we're introduced to one of the functions of `purrr`. This is a package that is installed as part of the 'tidyverse'. The function we're interested in is called `map`. To illustrate its potential, we can immediately apply a state-wise statistical modeling exercise. 
+
+Depending on what other libraries are loaded, we sometimes have be careful that we're calling the function we think we are. For example, if we have a geographical mapping library loaded, it's quite likely that it also has a function called 'map'. You can clarify a function call by preceding it with the package name, followed by two colons. For example `maps::map` or `purrr::map`.
+
+The function `purrr::map` takes two arguments. The first is the data, the second is the function to be applied to the data. For data science good practice, it makes sense to put the model object fitted for each state with the appropriate state in the original data frame - not in a new data frame, as that requires extra coordination and possible mistakes.
+
+*Task 13: Add a column called 'model' to the 'by.state' data frame, where each row (state) has its own model object (the result of fitting the linear model you wrote as a function in Task 12). Output 'by.state' to see what has changed.*
+
+
+```{r doPurrrMap-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+ld.pop.clim <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ldPopClimLog.csv")
+by.state <- ld.pop.clim %>% group_by(state) %>% nest
+lm.size.yr <- function(df){
+  lm(size ~ year, data = df)
+}
+```
+
+
+```{r doPurrrMap, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+```{r doPurrrMap-solution}
+by.state %<>% mutate(model = map(data, lm.size.yr))
+by.state
+```
+
+Now we have a new list-column called 'model', so each row of the data frame 'by.state' is a state of the US where the first column is its name, the 2nd is its data and the 3rd is its model. While this is already good news from an organizational point of view (imagine running 50 linear models, one for each state and storing each as a separate object in your R environment), we can make further use of this organization.
+
+### The `modelr` package
+
+For example, the `purrr` package has another function called `map2` that applies functions involving two columns of our data frame. We can combine this power with the `modelr` package. This package has some useful inbuilt functions, including `add_residuals`, which operates on 'data' and 'model' to evaluate the discrepancy between the data and the fitted model. 
+
+*Task 14: Load the `modelr` library and add a column to the data frame called 'resids' that will use the inbuilt function `add_residuals` applied to 'data' and 'model'. Note the arguments to `map2` go in order: data, model, function. Check you added the column correctly by accessing the residuals for Georgia (see Task 11 for a recap on how to access such information).*
+
+```{r addResids-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+ld.pop.clim <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ldPopClimLog.csv")
+by.state <- ld.pop.clim %>% group_by(state) %>% nest
+lm.size.yr <- function(df){
+  lm(size ~ year, data = df)
+}
+by.state %<>% mutate(model = map(data, lm.size.yr))
+```
+
+
+```{r addResids, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+```{r addResids-solution}
+library(modelr)
+by.state %<>% mutate(resids = map2(data, model, add_residuals))
+by.state$resids[[10]]
+```
+
+
+### Using our own functions 
+
+The last code chunk showed us that we have created a list-column called 'resids', a data frame that contains, among other things, residuals in a column called 'resid'. Because the residuals can be positive or negative (over- or under-estimating population size), we may be interested to assess which states are poorly described by our linear model by just adding the residuals for each county-year combination in each state. 
+
+*Task 15: Write a function called 'sum.resids' that accepts an object of the type in the 'resids' list-column, and returns a sum of the **abs**olute values of the residuals, i.e. ignoring sign: abs(3)+abs(-2)=5. Use the function to add a column called 'total.resid' to 'by.state' that provides the total size of residuals summed over counties and years. Inspect the data frame 'by.state' to observe what you have created, and confirm that the value for Georgia contains a single number (the overall discrepancy between the model and the data for this state).*
+
+```{r addTotResid-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+library(modelr)
+ld.pop.clim <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ldPopClimLog.csv")
+by.state <- ld.pop.clim %>% group_by(state) %>% nest
+lm.size.yr <- function(df){
+  lm(size ~ year, data = df)
+}
+by.state %<>% mutate(model = map(data, lm.size.yr))
+by.state %<>% mutate(resids = map2(data, model, add_residuals))
+```
+
+```{r addTotResid, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+
+```{r addTotResid-solution}
+sum.resids <- function(x){
+  sum(abs(x$resid))
+}
+by.state %<>% mutate(total.resid = map(resids,sum.resids))
+by.state
+by.state$total.resid[[10]]
+```
+
+In addition, we can obtain and visualize the slope of population growth by state.
+
+*Task 16: Write a function called 'get.slope' that accepts a linear model and returns the slope (model M has slope M$coefficients[2]) and then use this function to create a new column called 'slope' in the 'by.state' data frame, that is the slope for each state. Inspect the updated data frame.*
+
+```{r getSlope2-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+library(modelr)
+ld.pop.clim <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ldPopClimLog.csv")
+by.state <- ld.pop.clim %>% group_by(state) %>% nest
+lm.size.yr <- function(df){
+  lm(size ~ year, data = df)
+}
+by.state %<>% mutate(model = map(data, lm.size.yr))
+by.state %<>% mutate(resids = map2(data, model, add_residuals))
+sum.resids <- function(x){
+  sum(abs(x$resid))
+}
+by.state %<>% mutate(total.resid = map(resids,sum.resids))
+```
+
+
+```{r getSlope2, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+```{r getSlope2-solution}
+get.slope <- function(M){
+  M$coefficients[2]
+}
+by.state %<>% mutate(slope = purrr::map(model, get.slope))
+by.state
+```
+
+While we're doing a great job of keeping our data organized, we've created another list-column (slope in data frame 'by.state'). For visualization, we're going to want to `unnest` these data structures.
+
+*Task 17: Run the code below to unnnest state data on 'slope'.*
+
+```{r unnest, exercise=T}
+slopes <- unnest(by.state, slope)
+```
+
+
+Now we can pass this new data frames to ggplot to see how the growth rate manifested in different states.
+
+*Task 18: Plot the growth rate (slope value) for all states. Hint: If the states (x-axis) are hard to read, we can rotate them to be vertical by adding `+ theme(axis.text.x = element_text(angle = 90, hjust = 1))` to the ggplot layers.*
+
+```{r plotSlopeResid-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+library(modelr)
+ld.pop.clim <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ldPopClimLog.csv")
+by.state <- ld.pop.clim %>% group_by(state) %>% nest
+lm.size.yr <- function(df){
+  lm(size ~ year, data = df)
+}
+by.state %<>% mutate(model = map(data, lm.size.yr))
+by.state %<>% mutate(resids = map2(data, model, add_residuals))
+sum.resids <- function(x){
+  sum(abs(x$resid))
+}
+by.state %<>% mutate(total.resid = map(resids,sum.resids))
+get.slope <- function(M){
+  M$coefficients[2]
+}
+by.state %<>% mutate(slope = purrr::map(model, get.slope))
+slopes <- unnest(by.state, slope)
+```
+
+```{r plotSlopeResid, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+```{r plotSlopeResid-solution}
+slopes %>% ggplot(aes(state,slope))+geom_point()+theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+To conclude, let's see our way of organizing the data let's us quickly explore the correlation between rainfall and cases of Lyme disease. 
+
+*Task 19: Write a function called 'run.cort' hat accepts an element of the 'by.state2$data' list-column and returns the spearman correlation coefficient between Lyme disease 'cases' and 'prcp'. Hints: (i) look up `cor.test` for general help with correlation tests; (ii) append “$estimate” to the end of the `cor.test` call to pull out the correlation coefficient; (iii) wrap the entire thing in `supressWarnings()` to prevent R repeatedly warning you about computing p-values with ties (which is not a big deal).*
+
+```{r corFn, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+
+```{r corFn-solution}
+run.cor <- function(df){
+  suppressWarnings(cor.test(df$cases,df$prcp,method="spearman")$estimate)
+}
+```
+
+Task 20: As a final task (i) use your 'run.cor' function to add a list-column called 'cor' to the 'by.state' data frame; (ii) create a new data frame called 'cors' where you unnest this information (similar to Task 17); (iii) arrange this data frame in descending order of correlation values (as in Wrangling Task 16); (iv) add the line `cors$state <- factor(cors$state, levels=unique(cors$state))` to coerce state names from 'character to factor' so they may be plotted in correlation order; (v) plot the correlations in a similar way to Task 18.
+
+```{r plotCor-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+library(modelr)
+ld.pop.clim <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ldPopClimLog.csv")
+by.state <- ld.pop.clim %>% group_by(state) %>% nest
+lm.size.yr <- function(df){
+  lm(size ~ year, data = df)
+}
+by.state %<>% mutate(model = map(data, lm.size.yr))
+by.state %<>% mutate(resids = map2(data, model, add_residuals))
+sum.resids <- function(x){
+  sum(abs(x$resid))
+}
+by.state %<>% mutate(total.resid = map(resids,sum.resids))
+get.slope <- function(M){
+  M$coefficients[2]
+}
+by.state %<>% mutate(slope = purrr::map(model, get.slope))
+slopes <- unnest(by.state, slope)
+run.cor <- function(df){
+  suppressWarnings(cor.test(df$cases,df$prcp,method="spearman")$estimate)
+}
+```
+
+```{r plotCor, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+
+```{r plotCor-solution}
+by.state %<>% mutate(cor = purrr::map(data, run.cor))
+cors <- unnest(by.state,cor)
+cors %<>% arrange(desc(cor))
+cors$state <- factor(cors$state, levels=unique(cors$state))
+ggplot(cors,aes(state,cor))+geom_point()+
+theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+Great job! You've come a long way in importing and visualizing data and in keeping complex modeling information well organized to help you pick up on important features. While we only looked at a few examples, they introduce you to the style of combining data with modeling inquiries. Your own research can make use of these good practices, which will become routine allowing you to focus more on the research questions.

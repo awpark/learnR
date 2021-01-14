@@ -21,7 +21,7 @@ library(learnr)
 
 3. Contrast data sets that are and are not in 'tidy' format
 
-4. Complete and solve coding challenges related to data wrangling
+4. Complete and solve coding challenges related to data wrangling, including piping
 
 5. Modify code presented to help with your own projects
 
@@ -29,7 +29,7 @@ library(learnr)
 
 ## Introduction
 
-This is the third in a series of five exercises that constitute _Training Module 1: Introduction to Scientific Programming_, taught through the IDEAS PhD program at the University of Georgia Odum School of Ecology in conjunction with the Center for the Ecology of Infectious Diseases. 
+This is the third in a series of exercises that constitute _Training Module 1: Introduction to Scientific Programming_, taught through the IDEAS PhD program at the University of Georgia Odum School of Ecology in conjunction with the Center for the Ecology of Infectious Diseases. 
 
 If coding in R is relatively new to you, you may find it helpful to first watch this introductory video that introduces ideas we'll be using
 ![](https://youtu.be/yGrsbtAmUmI)
@@ -500,7 +500,8 @@ ld.pop.clim <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/
 ```
 
 ```{r map, exercise=TRUE, message=FALSE, warning=FALSE}
-#get map data for US counties and states (part of ggplot)
+#get map data for US counties and states
+library(maps)
 county_map <- map_data("county")
 state_map <- map_data("state")
 #to prepare data for plot, first group biological data by fips
