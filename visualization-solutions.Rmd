@@ -51,7 +51,7 @@ library(magrittr)
 
 
 ```{r readData, exercise=FALSE, message=FALSE, warning=FALSE}
-mers <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ldPopClim.csv")
+mers <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/cases.csv")
 ```
 
 
@@ -63,7 +63,7 @@ We can inspect the data using the base R function `head`, which displays the fir
 ```{r inspectData1-setup, echo=FALSE, message=F, warning=FALSE}
 library(tidyverse)
 library(magrittr)
-mers <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/ldPopClim.csv")
+mers <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/cases.csv")
 ```
 
 
