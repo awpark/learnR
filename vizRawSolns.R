@@ -1,0 +1,62 @@
+
+
+1. Create a working directory called `mers`
+2. Download the file `cases.csv` and move it to `mers`
+3. Open a session of R Studio
+4. Set the working directory by typing `setwd('~/./mers)` where `.` is the file path to your working directory. (Alternatively, you can navigate by using the `Session` drop down menu and selecting `Set Working Directory`.)
+5. Create an R *dataframe* by typing `data <- read.csv('cases.csv')` as shown below.
+
+**Exercise. Use our corrected infectious period variable (`infectious.period2`) to study the change in the inectious period over the course of the MERS epidemic.**
+  
+  ```{r, echo=FALSE}
+mers <- read.csv('cases.csv')
+
+mers$hospitalized[890] <- c('2015-02-20')
+mers <- mers[-471,]
+
+library(lubridate)
+library(ggplot2)
+mers$onset2 <- ymd(mers$onset)
+mers$hospitalized2 <- ymd(mers$hospitalized)
+class(mers$onset2)
+day0 <- min(na.omit(mers$onset2))
+
+mers$epi.day <- as.numeric(mers$onset2 - day0)
+
+mers$infectious.period <- mers$hospitalized2-mers$onset2    # calculate "raw" infectious period
+class(mers$infectious.period)           # these data are class "difftime"
+mers$infectious.period <- as.numeric(mers$infectious.period, units = "days")
+```
+
+```{r}
+mers$infectious.period2 <- ifelse(mers$infectious.period<0,0,mers$infectious.period)
+
+ggplot(data=mers, mapping=aes(x=epi.day, y=infectious.period2)) + 
+  geom_point(mapping = aes(color=country)) +
+  scale_y_continuous(limits = c(0, 50)) +
+  labs(x='Epidemic day', y='Infectious period',
+       title='MERS infectious period (positive values only) over time', caption="Data from: https://github.com/rambaut/MERS-Cases/blob/gh-pages/data/cases.csv")
+```
+
+
+**Exercise. In data from many outbreaks it can be seen that there is a kind of *societal learning*. When the infection first emerges it is not quickly recognized, public health resources have not been mobilized, it is not known what symptoms are diagnostic, how to treat, etc. But, quickly, this information is collected and the utbreak is contained. Is there evidence of this kind of societal learning in the mers data. Add a curve fit using `geom_smooth` to explore this question. Hint: I solved using the `loess` method because the default smoother (gam) failed.**
+  
+  ```{r}
+ggplot(data=mers, mapping=aes(x=epi.day, y=infectious.period2)) + 
+  geom_point(mapping = aes(color=country)) +
+  geom_smooth(method='loess') +
+  scale_y_continuous(limits = c(0, 50)) +
+  labs(x='Epidemic day', y='Infectious period',
+       title='MERS infectious period (positive values only) over time', caption="Data from: https://github.com/rambaut/MERS-Cases/blob/gh-pages/data/cases.csv")
+```
+
+**Exercise. Plot `infectious.period2` against time, as before, but this time add a separate smooth fit for each country.**
+  
+  ```{r}
+ggplot(data=mers, mapping=aes(x=epi.day, y=infectious.period2)) + 
+  geom_point() +
+  geom_smooth(method='loess', mapping = aes(color=country)) +
+  scale_y_continuous(limits = c(0, 50)) +
+  labs(x='Time', y='Infectious period',
+       title='MERS infectious period (positive values only) over time', caption="Data from: https://github.com/rambaut/MERS-Cases/blob/gh-pages/data/cases.csv")
+```

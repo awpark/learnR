@@ -1,0 +1,60 @@
+---
+title: "Data visualization"
+author: "Andrew W. Park"
+output:
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
+library(learnr)
+```
+
+## Learning outcomes
+
+1. to
+
+2. be
+
+3. done
+
+## Introduction
+
+This is the first in a series of modules that constitute *Introduction to Scientific Programming*, taught through the IDEAS PhD program at the University of Georgia's Odum School of Ecology in conjunction with the Center for the Ecology of Infectious Diseases. This module introduces the principles and practice of data visualization with special emphasis on analysis of infectious disease data. Programming is performed in R. Recommended reading for this module is the book *R for Data Science* by Hadley Wickham and Garret Grolemund (O'Reilly Media, 2017).
+
+Specifically, this module seeks to introduce the student to basic tasks and operations required to visualize data in R using the packages `ggplot2`. *Data visualization* is a key component of *exploratory data analysis*. `ggplot2` implements the idea that there is a "grammar of graphics" -- that is an organizational scheme based on the semantic relationships among different graphical elements. Data visualization theory, practice, and exploratory data analysis are not covered systematically, but rather by example, with the expectation that students will develop further skills by extending the provided examples.
+
+
+## Case study
+
+As a running example in this module, we will study a data set on the spread of Middle East Respiratory Syndrome Corona Virus (MERS-CoV) compiled and originally made available by Andrew Rambaut on his Github site (https://github.com/rambaut/MERS-Cases/blob/gh-pages/data/cases.csv). MERS-CoV is a positive-sense single-stranded Betacoronavirus. Its closest relatives are the SARS coronavirus, common-cold coronavirus, and other human betacoronaviruses. MERS-CoV first emerged in Saudi Arabia in 2012. It causes a severe respiratory illness. Transmission to humans may be direct (person-to-person), particularly in hospitals, or from contact with infected animals. Exposure to camels is associated with many cases, although bats, particularly the Egyptian Tomb bat (*Taphozous perforatus*), are suspected to be the maintenance reservoir. The case fatality rate is around 40%.
+
+## Getting the data into R
+
+To load the MERS data into an R session, we will first load a key package `tidyverse`. This actually loads a suite of packages including `ggplot2` and `readr`, with the latter providing useful functions for reading data into R. We'll additionally load a package called `magrittr` which allows us to write R code as workflows passing through 'pipes'. If interested, you can read more about pipes here: https://r4ds.had.co.nz/pipes.html
+
+```{r libLoad, exercise=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+```
+
+By loading `tidyverse` we now have the function `read_csv` available to us. Use this function to read in the file "cases.csv" assigned to the variable "mers". Throughout, you can see the way to solve any coding challenges set to you by clicking on the 'solution' button.
+
+
+```{r readData-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+```
+
+
+```{r readData, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+```{r readData-solution}
+mers <- read_csv("cases.data")
+```
+
