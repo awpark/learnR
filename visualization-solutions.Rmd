@@ -94,66 +94,144 @@ mers <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/cases.c
 class(mers$onset)
 ```
 
-We see that the data in this column represent dates but are formatted as a data type called factor. It is common that R defaults to assuming factor. The other date column ("hospitalized") is also formatted as factor. These dates can be reformatted using the `lubridate` package. Next, we'll use this package to create a new version of the "onset" and "hospitalized" columns (called "onset2" and "hospitalized2") using the `Date` class. 
-
-```{r}
-library(lubridate)
-# here the %<>% symbol is a 2-way pipe: (i) we pass mers from L to R and use the function mutate to create two new columns
-# (ii) we pass the result back (from R to L) i.e. we call the new data frame 'mers' which is now the original plus these two
-# new columns. The 'ymd' function turns text like "2015-02-14" into data meaning 14th Feb 2015.
-mers %<>% mutate(onset2=ymd(onset), hospitalized2=ymd(hospitalized))
-class(mers$onset2)
-```
-
-
-We may also find it useful to have a simple numerical value for the days elapsed since the start of the epidemic.  We use the following cod, which identifies the earliest onset date then measures time since that date.
+We see that the data in this column represent dates. We may also find it useful to have a simple numerical value for the days elapsed since the start of the epidemic.  We use the following code, which identifies the earliest onset date then measures time since that date.
 
 ```{r}
 # R needs to be told that any NA values are not included in search for minimum otherwise NA is the minimum!
 # start with mers; pull the onset2 column; find the min; store in 'day0'
-day0 <- mers %>% pull(onset2) %>% min(na.rm=T)
+day0 <- mers %>% pull(onset) %>% min(na.rm=T)
 # create a new column 'epi.day' which is number of days since "case 0". We use 'as.numeric' so this is just stored as a number.
-mers %<>% mutate(epi.day=as.numeric(onset2 - day0))
+mers %<>% mutate(epi.day=as.numeric(onset - day0))
 ```
 
 
 
-## Making a plot
+## Making a bar plot
 
 
-We can explore some of the MERS data using the function `ggplot`. One plot we might wish to produce is the *epidemic curve* which is basically a bar plot.  An empty plot can be produced using the command `ggplot(data=mers)`. The epidemic curve is then produced by adding a bar plot using the geom function `geom_bar`. The last line of our code adds some labels. Ryn the code to check it works.
+We can explore some of the MERS data using the function `ggplot`. One plot we might wish to produce is the *epidemic curve* which is basically a bar plot.  We can pass the "mers" dataframe to ggplot to create an empty plot using the command `mers %>% ggplot(.)`, where the "." signifies whatever just got passed through the pipe (this is useful style if you want to manipulate your data just before plotting, for example to remove NA values or filter to a subset of your data). The epidemic curve is then produced by adding a bar plot using the geom function `geom_bar`. The last line of our code adds some labels. Run the code to check it works.
 
 ```{r epiCurve-setup, echo=FALSE, message=F, warning=FALSE}
 library(tidyverse)
 library(magrittr)
-library(lubridate)
-load("getMers1.Rda")
+mers <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/cases.csv")
+day0 <- mers %>% pull(onset) %>% min(na.rm=T)
+mers %<>% mutate(epi.day=as.numeric(onset - day0))
 ```
 
 
 ```{r epiCurve, exercise=FALSE, message=FALSE, warning=FALSE}
-ggplot(data=mers) + 
+mers %>% ggplot(.) + 
   geom_bar(mapping=aes(x=epi.day)) +
   labs(x='Epidemic day', y='Case count', title='Global count of MERS cases by date of symptom onset',
        caption="Data from: https://github.com/rambaut/MERS-Cases/blob/gh-pages/data/cases.csv")
 ```
 
-<!-- **Exercise. To produce this plot, type all the commands up to this point *exactly* as they appear. Particularly, note that as we "build" the plot in the last code snippet, we end each line with the addition syhmbol "+". What happens if we don't use this convention?** -->
+Pay attention to the structure of the ggplot code. Note that as we "build" the plot, we end each line with the plus symbol "+". Of course, all these cases are distributed among a number of different countries. We can modify the plot to show this using the using the aesthetic `fill`. 
 
-<!-- Of course, all these cases are distributed among a number of different countries. We can modify the plot to show this using the using the aesthetic `fill`. -->
+```{r epiCurveByCountry-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+mers <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/cases.csv")
+day0 <- mers %>% pull(onset) %>% min(na.rm=T)
+mers %<>% mutate(epi.day=as.numeric(onset - day0))
+```
 
-<!-- ```{r} -->
-<!-- ggplot(data=mers) +  -->
-<!--   geom_bar(mapping=aes(x=epi.day, fill=country)) + -->
-<!--   labs(x='Epidemic day', y='Case count', title='Global count of MERS cases by date of symptom onset', -->
-<!--        caption="Data from: https://github.com/rambaut/MERS-Cases/blob/gh-pages/data/cases.csv") -->
-<!-- ``` -->
 
-<!-- In this example, we've shown how to make a basic bar plot with `ggplot` and the geom function `geom_bar`. Our mapping of data objects to plot objects was performed using `aes` and we used the `fill` aesthetic to examing the distribution of cases among countries. There are lots of variations on the bar plot that we can examine. For instance, we can modify the `position`, which is another argument to `geom_bar`. -->
+```{r epiCurveByCountry, exercise=FALSE, message=FALSE, warning=FALSE}
+mers %>% ggplot(.) +
+  geom_bar(mapping=aes(x=epi.day, fill=country)) +
+  labs(x='Epidemic day', y='Case count', title='Global count of MERS cases by date of symptom onset',
+       caption="Data from: https://github.com/rambaut/MERS-Cases/blob/gh-pages/data/cases.csv")
+```
 
-<!-- **Exercise. Modify the epidemic curve using the argument `position="fill"`. What does this plot show?** -->
+We can use this example to produce another plot. At the beginning of the new chunk, add a line that creates a new column called "age2" which will just be the numeric version of age (which is stored as 'character' data because some data were entered with uncertainty, e.g. "?60" are as a threshold, e.g. "60+"). Data like these won't be plotted because they will be converted to NA when we try to make them numeric. Next, make a plot where "age2" is the x-axis and case count is plotted as before. To tidy things up, we'll put a few steps between naming the data frame and passing it through a pipe to ggplot. Specifically we will (i) use the `drop_na` function to remove NA values in age and gender columns; (ii) `filter` data so that only entries with "M" or "F" in the gender column are plotted. You should also update the x, y, and title labels. If you're not sure how to complete the plot, use the hints buttons. 
 
-<!-- **Exercise. Another way to modify a bar plot is to change the coordinates. This can be done by "adding" `coord_flip()` and `coord_polar()` to the plot. What does this plot show?** -->
+```{r ageSex-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+mers <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/cases.csv")
+day0 <- mers %>% pull(onset) %>% min(na.rm=T)
+mers %<>% mutate(epi.day=as.numeric(onset - day0))
+```
 
+
+```{r ageSex, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+```{r ageSex-solution}
+mers %<>% mutate(age2=as.numeric(age))
+mers %>% drop_na(age, gender) %>% filter(gender=="M"|gender=="F") %>% ggplot(.) +
+  geom_bar(mapping=aes(x=age2, fill=gender)) +
+  labs(x='Age', y='Case count', title='Global count of MERS cases by age and sex',
+       caption="Data from: https://github.com/rambaut/MERS-Cases/blob/gh-pages/data/cases.csv")
+```
+
+```{r ageSex-hint-1}
+mers %<>% mutate(age2=...)
+```
+
+```{r ageSex-hint-2}
+mers %<>% mutate(age2=as.numeric(age))
+```
+
+```{r ageSex-hint-3}
+mers %<>% mutate(age2=as.numeric(age))
+mers %>% drop_na(age, gender) %>% ...
+```
+
+```{r ageSex-hint-4}
+mers %<>% mutate(age2=as.numeric(age))
+mers %>% drop_na(age, gender) %>% filter(gender=="M"|gender=="F") %>% ...
+```
+
+
+## Making histograms
+
+Using ggplot, we're not restricted to bar plots. In this example we will create a new column called "infectious.period" crudely estimated as the difference between the "hospitalization" date and the symptoms "onset" date. 
+
+```{r histoIP-setup,echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+mers <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/cases.csv")
+day0 <- mers %>% pull(onset) %>% min(na.rm=T)
+mers %<>% mutate(epi.day=as.numeric(onset - day0))
+mers %<>% mutate(age2=as.numeric(age))
+```
+
+
+```{r histoIP, exercise=FALSE, message=FALSE, warning=FALSE}
+mers %<>% mutate(infectious.period=hospitalized-onset)   # calculate "raw" infectious period
+mers %>% ggplot(.) +
+  geom_histogram(aes(x=infectious.period)) + 
+  labs(x='Infectious period', y='Frequency', title='Distribution of calculated MERS infectious period',
+       caption="Data from: https://github.com/rambaut/MERS-Cases/blob/gh-pages/data/cases.csv")
+```
+
+While the code is correct, we have negative infectious periods! This is because of nosocomial transmission (occurring in a hospital). When a patient is admitted to hospital for a non-MERS reason then later acquires MERS in hospital, their hospitalization date will precede their symptoms onset date. **Copy the histogram plotting code above into the empty code chunk below and add a filter between "mers" and "ggplot" so that we only plot positive infectious period data".
+
+```{r histoIPpos-setup,echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+mers <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/cases.csv")
+day0 <- mers %>% pull(onset) %>% min(na.rm=T)
+mers %<>% mutate(epi.day=as.numeric(onset - day0))
+mers %<>% mutate(age2=as.numeric(age))
+mers %<>% mutate(infectious.period=hospitalized-onset) 
+```
+
+
+```{r histoIPpos, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+```{r histoIPpos-solution, exercise=FALSE, message=FALSE, warning=FALSE}
+mers %<>% mutate(infectious.period=hospitalized-onset)   # calculate "raw" infectious period
+mers %>% ggplot(.) +
+  geom_histogram(aes(x=infectious.period)) + 
+  labs(x='Infectious period', y='Frequency', title='Distribution of calculated MERS infectious period',
+       caption="Data from: https://github.com/rambaut/MERS-Cases/blob/gh-pages/data/cases.csv")
+```
 
 
