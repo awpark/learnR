@@ -120,15 +120,20 @@ $(document).ready(function () {
 <div id="section-learning-outcomes" class="section level2">
 <h2>Learning outcomes</h2>
 <ol style="list-style-type: decimal">
-<li><p>to</p></li>
-<li><p>be</p></li>
-<li><p>done</p></li>
+<li><p>Learn the basic template for all <code>ggplot</code>-ing</p></li>
+<li><p>Convert date format to numeric for ease of plotting</p></li>
+<li><p>Use structure in the data to automatically color data (points, bars, etc)</p></li>
+<li><p>Process data on-the-fly for better plots (drop_na, filter, new columns)</p></li>
+<li><p>Make common plots (bar plots, box plots, scatter plots, histograms)</p></li>
+<li><p>Add trend lines to plots</p></li>
+<li><p>Create panels automatically with faceting</p></li>
 </ol>
 </div>
 <div id="section-introduction" class="section level2">
 <h2>Introduction</h2>
 <p>This is the first in a series of modules that constitute <em>Introduction to Scientific Programming</em>, taught through the IDEAS PhD program at the University of Georgia’s Odum School of Ecology in conjunction with the Center for the Ecology of Infectious Diseases. This module introduces the principles and practice of data visualization with special emphasis on analysis of infectious disease data. Programming is performed in R. Recommended reading for this module is the book <em>R for Data Science</em> by Hadley Wickham and Garret Grolemund (O’Reilly Media, 2017).</p>
-<p>Specifically, this module seeks to introduce the student to basic tasks and operations required to visualize data in R using the packages <code>ggplot2</code>. <em>Data visualization</em> is a key component of <em>exploratory data analysis</em>. <code>ggplot2</code> implements the idea that there is a “grammar of graphics” – that is an organizational scheme based on the semantic relationships among different graphical elements. Data visualization theory, practice, and exploratory data analysis are not covered systematically, but rather by example, with the expectation that students will develop further skills by extending the provided examples.</p>
+<p>Specifically, this module seeks to introduce the student to basic tasks and operations required to visualize data in R using the package <code>ggplot2</code>. <em>Data visualization</em> is a key component of <em>exploratory data analysis</em>. <code>ggplot2</code> implements the idea that there is a “grammar of graphics” – that is an organizational scheme based on the semantic relationships among different graphical elements. Data visualization theory, practice, and exploratory data analysis are not covered systematically, but rather by example, with the expectation that students will develop further skills by extending the provided examples.</p>
+<p>If you’re unfamiliar with <code>ggplot</code>, you may find it helpful to first review the video we’ve included. <img src="https://youtu.be/7p42I3floqo" /></p>
 </div>
 <div id="section-case-study" class="section level2">
 <h2>Case study</h2>
@@ -183,7 +188,7 @@ mers %&lt;&gt;% mutate(epi.day=as.numeric(onset - day0))</code></pre>
   labs(x=&#39;Epidemic day&#39;, y=&#39;Case count&#39;, title=&#39;Global count of MERS cases by date of symptom onset&#39;,
        caption=&quot;Data from: https://github.com/rambaut/MERS-Cases/blob/gh-pages/data/cases.csv&quot;)</code></pre>
 <p><img src="visualization-solutions_files/figure-html/epiCurve-1.png" width="624" /></p>
-<p>Pay attention to the structure of the ggplot code. Note that as we “build” the plot, we end each line with the plus symbol “+”. Of course, all these cases are distributed among a number of different countries. We can modify the plot to show this using the using the aesthetic <code>fill</code>.</p>
+<p>Pay attention to the structure of the ggplot code. Note that as we “build” the plot, we end each line with the plus symbol “+” - except the last line! Of course, all these MERS cases are distributed among a number of different countries. We can modify the plot to show this using the using the aesthetic <code>fill</code>.</p>
 <pre class="r"><code>mers %&gt;% ggplot(.) +
   geom_bar(mapping=aes(x=epi.day, fill=country)) +
   labs(x=&#39;Epidemic day&#39;, y=&#39;Case count&#39;, title=&#39;Global count of MERS cases by date of symptom onset&#39;,

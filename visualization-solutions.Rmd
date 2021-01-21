@@ -15,19 +15,28 @@ library(learnr)
 
 ## Learning outcomes
 
-1. to
+1. Learn the basic template for all `ggplot`-ing
 
-2. be
+2. Convert date format to numeric for ease of plotting
 
-3. done
+3. Use structure in the data to automatically color data (points, bars, etc)
+
+4. Process data on-the-fly for better plots (drop_na, filter, new columns)
+
+5. Make common plots (bar plots, box plots, scatter plots, histograms)
+
+6. Add trend lines to plots
+
+7. Create panels automatically with faceting
 
 ## Introduction
 
 This is the first in a series of modules that constitute *Introduction to Scientific Programming*, taught through the IDEAS PhD program at the University of Georgia's Odum School of Ecology in conjunction with the Center for the Ecology of Infectious Diseases. This module introduces the principles and practice of data visualization with special emphasis on analysis of infectious disease data. Programming is performed in R. Recommended reading for this module is the book *R for Data Science* by Hadley Wickham and Garret Grolemund (O'Reilly Media, 2017).
 
-Specifically, this module seeks to introduce the student to basic tasks and operations required to visualize data in R using the packages `ggplot2`. *Data visualization* is a key component of *exploratory data analysis*. `ggplot2` implements the idea that there is a "grammar of graphics" -- that is an organizational scheme based on the semantic relationships among different graphical elements. Data visualization theory, practice, and exploratory data analysis are not covered systematically, but rather by example, with the expectation that students will develop further skills by extending the provided examples.
+Specifically, this module seeks to introduce the student to basic tasks and operations required to visualize data in R using the package `ggplot2`. *Data visualization* is a key component of *exploratory data analysis*. `ggplot2` implements the idea that there is a "grammar of graphics" -- that is an organizational scheme based on the semantic relationships among different graphical elements. Data visualization theory, practice, and exploratory data analysis are not covered systematically, but rather by example, with the expectation that students will develop further skills by extending the provided examples.
 
 If you're unfamiliar with `ggplot`, you may find it helpful to first review the video we've included. 
+![](https://youtu.be/7p42I3floqo)
 
 ## Case study
 
@@ -95,7 +104,7 @@ mers <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/cases.c
 class(mers$onset)
 ```
 
-We see that the data in this column represent dates. We may also find it useful to have a simple numerical value for the days elapsed since the start of the epidemic.  We use the following code, which identifies the earliest onset date then measures time since that date.
+We see that the data in this column represent dates. We may also find it useful to have a simple numerical value for the days elapsed since the start of the epidemic.  We use the following code, which identifies the earliest onset date then measures time since that date. The last line of code in this chunk starts with the data frame "mers", passes it through a pipe from L to R (the ">" part of the symbol). It then creates a new column called "epi.day" using the `mutate` function. This column is the number of days between each person's symptom onset and the start of the epidemic. This is all passed back through the pipe from R to L (the "<" part of the symbol) so that "mers" gets updated (overwritten) with this new column included. 
 
 ```{r}
 # R needs to be told that any NA values are not included in search for minimum otherwise NA is the minimum!
@@ -110,7 +119,7 @@ mers %<>% mutate(epi.day=as.numeric(onset - day0))
 ## Making a bar plot
 
 
-We can explore some of the MERS data using the function `ggplot`. One plot we might wish to produce is the *epidemic curve* which is basically a bar plot.  We can pass the "mers" dataframe to ggplot to create an empty plot using the command `mers %>% ggplot(.)`, where the "." signifies whatever just got passed through the pipe (this is useful style if you want to manipulate your data just before plotting, for example to remove NA values or filter to a subset of your data). The epidemic curve is then produced by adding a bar plot using the geom function `geom_bar`. The last line of our code adds some labels. Run the code to check it works.
+We can explore some of the MERS data using the function `ggplot`. One plot we might wish to produce is the *epidemic curve* which is basically a bar plot.  We can pass the "mers" dataframe to ggplot to create an empty plot using the command `mers %>% ggplot(.)`, where the "." signifies whatever just got passed through the pipe (this is useful style if you want to manipulate your data just before plotting, for example to remove NA values or filter to a subset of your data). The epidemic curve is then produced by adding a bar plot using the geom function `geom_bar`. The last line of our code adds some labels.
 
 ```{r epiCurve-setup, echo=FALSE, message=F, warning=FALSE}
 library(tidyverse)
@@ -128,7 +137,7 @@ mers %>% ggplot(.) +
        caption="Data from: https://github.com/rambaut/MERS-Cases/blob/gh-pages/data/cases.csv")
 ```
 
-Pay attention to the structure of the ggplot code. Note that as we "build" the plot, we end each line with the plus symbol "+". Of course, all these cases are distributed among a number of different countries. We can modify the plot to show this using the using the aesthetic `fill`. 
+Pay attention to the structure of the ggplot code. Note that as we "build" the plot, we end each line with the plus symbol "+" - except the last line! Of course, all these MERS cases are distributed among a number of different countries. We can modify the plot to show this using the using the aesthetic `fill`. 
 
 ```{r epiCurveByCountry-setup, echo=FALSE, message=F, warning=FALSE}
 library(tidyverse)
@@ -146,7 +155,7 @@ mers %>% ggplot(.) +
        caption="Data from: https://github.com/rambaut/MERS-Cases/blob/gh-pages/data/cases.csv")
 ```
 
-We can use this example to produce another plot. At the beginning of the new chunk, add a line that creates a new column called "age2" which will just be the numeric version of age (which is stored as 'character' data because some data were entered with uncertainty, e.g. "?60" are as a threshold, e.g. "60+"). Data like these won't be plotted because they will be converted to NA when we try to make them numeric. Next, make a plot where "age2" is the x-axis and case count is plotted as before. To tidy things up, we'll put a few steps between naming the data frame and passing it through a pipe to ggplot. Specifically we will (i) use the `drop_na` function to remove NA values in age and gender columns; (ii) `filter` data so that only entries with "M" or "F" in the gender column are plotted. You should also update the x, y, and title labels. If you're not sure how to complete the plot, use the hints buttons. 
+We can use this example to produce another plot. At the beginning of the new chunk, add a line that creates a new column called "age2" which will just be the numeric version of age (which is stored as 'character' data because some data were entered with uncertainty, e.g. "?60" or as a threshold, e.g. "60+"). Data like these won't be plotted because they will be converted to NA when we try to make them numeric. Next, make a plot where "age2" is the x-axis and case count is plotted as before. To tidy things up, we'll put a few steps between naming the data frame and passing it through a pipe to ggplot. Specifically we will (i) use the `drop_na` function to remove NA values in age and gender columns; (ii) `filter` data so that only entries with "M" or "F" in the gender column are plotted. You should also update the x, y, and title labels. If you're not sure how to complete the plot, use the hints buttons. 
 
 ```{r ageSex-setup, echo=FALSE, message=F, warning=FALSE}
 library(tidyverse)
@@ -210,7 +219,7 @@ mers %>% ggplot(.) +
        caption="Data from: https://github.com/rambaut/MERS-Cases/blob/gh-pages/data/cases.csv")
 ```
 
-While the code is correct, we have negative infectious periods! This is because of nosocomial transmission (occurring in a hospital). When a patient is admitted to hospital for a non-MERS reason then later acquires MERS in hospital, their hospitalization date will precede their symptoms onset date. **Copy the histogram plotting code above into the empty code chunk below and add a filter between "mers" and "ggplot" so that we only plot positive infectious period data".
+While the code is correct, we have negative infectious periods! This is because of nosocomial transmission (occurring in a hospital). When a patient is admitted to hospital for a non-MERS reason then later acquires MERS in hospital, their hospitalization date will precede their symptoms onset date. Copy the histogram plotting code above into the empty code chunk below and add a filter between "mers" and "ggplot" so that we only plot positive infectious period data".
 
 ```{r histoIPpos-setup,echo=FALSE, message=F, warning=FALSE}
 library(tidyverse)
