@@ -27,6 +27,7 @@ This is the first in a series of modules that constitute *Introduction to Scient
 
 Specifically, this module seeks to introduce the student to basic tasks and operations required to visualize data in R using the packages `ggplot2`. *Data visualization* is a key component of *exploratory data analysis*. `ggplot2` implements the idea that there is a "grammar of graphics" -- that is an organizational scheme based on the semantic relationships among different graphical elements. Data visualization theory, practice, and exploratory data analysis are not covered systematically, but rather by example, with the expectation that students will develop further skills by extending the provided examples.
 
+If you're unfamiliar with `ggplot`, you may find it helpful to first review the video we've included. 
 
 ## Case study
 
@@ -227,11 +228,122 @@ mers %<>% mutate(infectious.period=hospitalized-onset)
 ```
 
 ```{r histoIPpos-solution, exercise=FALSE, message=FALSE, warning=FALSE}
-mers %<>% mutate(infectious.period=hospitalized-onset)   # calculate "raw" infectious period
-mers %>% ggplot(.) +
+mers %>% filter(infectious.period>0) %>% ggplot(.) +
   geom_histogram(aes(x=infectious.period)) + 
   labs(x='Infectious period', y='Frequency', title='Distribution of calculated MERS infectious period',
        caption="Data from: https://github.com/rambaut/MERS-Cases/blob/gh-pages/data/cases.csv")
 ```
 
 
+## Making scatter plots with trend lines
+
+Some pathogens emerging in populations will undergo selection for more efficient transmission. This could, for example, cause the infectious period to change through time. To inspect this, we'll make another plot. Note that in this example, we've put the aesthetics (what goes on x, y axes, how to color data, etc.) with the ggplot function, not with the layer. This is because we're going to have >1 layer share the same aesthetics.
+
+```{r IPvsTime-setup,echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+mers <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/cases.csv")
+day0 <- mers %>% pull(onset) %>% min(na.rm=T)
+mers %<>% mutate(epi.day=as.numeric(onset - day0))
+mers %<>% mutate(age2=as.numeric(age))
+mers %<>% mutate(infectious.period=hospitalized-onset) 
+```
+
+```{r IPvsTime, exercise=FALSE, message=FALSE, warning=FALSE}
+mers %>% filter(infectious.period>0) %>% ggplot(.,aes(x=epi.day,y=infectious.period)) + geom_point() + 
+  labs(x='Epidemic day', y='Infectious period (days)', title='Calculated MERS infectious period over time',
+       caption="Data from: https://github.com/rambaut/MERS-Cases/blob/gh-pages/data/cases.csv")
+```
+
+Copy the code that made the scatter plot into the empty code chunk below and modify it two ways: (i) add an "and" statement (using the "&" symbol) to the filter function so that we only plot infectious periods (IP) with values 0<IP<50; (ii) add a trend line layer using the geom_smooth function. 
+
+```{r IPvsTimeSmooth-setup,echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+mers <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/cases.csv")
+day0 <- mers %>% pull(onset) %>% min(na.rm=T)
+mers %<>% mutate(epi.day=as.numeric(onset - day0))
+mers %<>% mutate(age2=as.numeric(age))
+mers %<>% mutate(infectious.period=hospitalized-onset) 
+```
+
+
+```{r IPvsTimeSmooth, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+```{r IPvsTimeSmooth-solution, exercise=FALSE, message=FALSE, warning=FALSE}
+mers %>% filter(infectious.period>0 & infectious.period<50) %>% ggplot(.,aes(x=epi.day,y=infectious.period)) + 
+  geom_point() + 
+  geom_smooth() + 
+  labs(x='Epidemic day', y='Infectious period (days)', title='Calculated MERS infectious period over time',
+       caption="Data from: https://github.com/rambaut/MERS-Cases/blob/gh-pages/data/cases.csv")
+     
+```
+
+```{r IPvsTimeSmooth-hint-1}
+mers %>% filter(infectious.period>0 & infectious.period<50) %>% ...
+```
+
+```{r IPvsTimeSmooth-hint-2}
+mers %>% filter(infectious.period>0 & infectious.period<50) %>% ggplot(.,aes(x=epi.day,y=infectious.period)) + 
+  geom_point() + 
+  geom_smooth() + ...
+```
+
+
+## Faceting
+
+We've already seen how we can use colors to express more detail in our data. However, sometimes it's clearer to display structured data in separate panels. We can use faceting to achieve this very easily with ggplot.
+
+```{r facet-setup,echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+mers <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/cases.csv")
+day0 <- mers %>% pull(onset) %>% min(na.rm=T)
+mers %<>% mutate(epi.day=as.numeric(onset - day0))
+mers %<>% mutate(age2=as.numeric(age))
+mers %<>% mutate(infectious.period=hospitalized-onset) 
+```
+
+```{r facet, exercise=FALSE, message=FALSE, warning=FALSE}
+mers %>% filter(infectious.period>0 & infectious.period<50 & country %in% c("Jordan","KSA","Qatar","UAE")) %>% ggplot(.,aes(x=epi.day,y=infectious.period)) +
+  geom_point()+geom_smooth()+facet_wrap(~country) +
+  labs(x='Epidemic day', y='Infectious period (days)', title='Calculated MERS infectious period over time',
+       caption="Data from: https://github.com/rambaut/MERS-Cases/blob/gh-pages/data/cases.csv")
+```
+
+Using the example above as a guide, create a new plot that inspects the age (remember the numeric column is "age2") of patients whose infection is either "clinical", "subclinical", or "fatal" (column="clinical", and you'll have to filter to only the 3 outcomes listed). For each of the three outcomes, visualize ages as a boxplot ("geom_boxplot()") and use faceting to show separate panels for every country (14 countries in total). While this sounds complex, you'll see this can all be achieved in one line of code. Good luck!
+
+```{r boxplot-setup,echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+mers <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/cases.csv")
+day0 <- mers %>% pull(onset) %>% min(na.rm=T)
+mers %<>% mutate(epi.day=as.numeric(onset - day0))
+mers %<>% mutate(age2=as.numeric(age))
+mers %<>% mutate(infectious.period=hospitalized-onset) 
+```
+
+
+```{r boxplot, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+```{r boxplot-solution, exercise=FALSE, message=FALSE, warning=FALSE}
+mers %>% filter(clinical %in% c("clinical","subclinical","fatal")) %>% ggplot(.,aes(x=clinical,y=age2)) +
+  geom_boxplot() +
+  facet_wrap(~country)
+```
+
+
+```{r boxplot-hint-1}
+mers %>% filter(clinical %in% c("clinical","subclinical","fatal")) %>% ...
+```
+
+```{r boxplot-hint-2}
+mers %>% filter(clinical %in% c("clinical","subclinical","fatal")) %>% ggplot(.,aes(x=clinical,y=age2)) + ...
+```
+
+
+       
