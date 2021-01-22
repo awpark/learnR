@@ -1,0 +1,108 @@
+---
+title: "Programing"
+author: "Andrew W. Park"
+output:
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
+library(learnr)
+```
+
+## Learning outcomes
+
+1. Writing scripts
+
+2. Writing functions
+
+3. Writing loops
+
+
+## Introduction
+
+This exercise is about writing *scripts*, purpose-built computer programs for performing some analysis. Our scripts will be written using the *RStudio Editor* and compiled using Rstudio. In this exercise we review many basic numerical operations and R functions, programming style, the development of custom functions, pipes, flow of control and loops.
+
+## Data
+
+West Nile virus (WNV) is a positive-sense single-stranded RNA virus transmitted by mosquitoes to a range of vertebrate hosts. WNV was first identified in Uganda in 1937 and found in parts of Europe, Asia, and Australia during the 1950s and 1960s. In 1999, WNV was first reported in the Americas in association with dieoffs of captive and wild birds. This outbreak initiated widespread epidemic that swept across North America and is now spreading in Central and South America. Humans are "dead end" hosts (humans do not achieve sufficiently high viremia to be infectious to mosquitoes). The majority of human cases are asymptomatic, but a small fraction of cases result in meningitis, encephalitis, and/or death. State-level data on the number of reported cases, meningitis/encephalitis, and fatalities are compiled and reported by the CDC and US Geological survey at <https://diseasemaps.usgs.gov/>. The file `wnv.csv` contains tabular data on the number of reported cases (mostly febrile cases), neuroinvasive cases (meningitis/encephalitis), and fatalities for all continental US states from 1999-2007. Additional data are the latitude and longitude of the centroid of each state.
+
+## Recap on manipulation and visualization
+
+As is customary with our style of coding, first, load the tidyverse and magrittr libraries, then read in the data from "https://raw.githubusercontent.com/awpark/learnR/master/wnv.csv" as data frame "mers" and create a histogram of the number of cases (just as represented in the "Total" column, which is a case count per state per year).
+
+```{r inspectData1, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+```{r inspectData1-solution, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+wnv <- read_csv('wnv.csv')#change URL once uploaded to github
+wnv %>% ggplot(.) + 
+  geom_histogram(aes(x=Total)) + 
+  labs(x='Cases', y='Frequency',
+       title='Number of cases in each state/year', caption="Data from: https://diseasemaps.usgs.gov/")
+```
+
+
+Next, create a new column called "cfr" which will represent the case fatality rate (proportion of infected individuals that die as a result of infection). This will make use of the function `mutate` and a manipulation of the columns "Fatal" and "Total". Next, create a histogram of these new case fatality rate values and color the proportion of each bin by the year in which they occur. Note this uses the "fill" aesthetic and because the "Year" column contains numeric data, you will need to fill using "as.factor(Year)". 
+
+```{r calcCfr-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+wnv <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/wnv.csv")
+```
+
+```{r caclCfr, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+
+```{r calcCfr-solution, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+wnv %<>% mutate(cfr=Fatal/Total)
+wnv %>% ggplot(.) + 
+  geom_histogram(aes(x=cfr,fill=as.factor(Year))) + 
+  labs(x='Cases', y='Frequency',
+       title='Case fatality rate', caption="Data from: https://diseasemaps.usgs.gov/")
+```
+
+## Conditional statements
+
+Often we want to make calculations or assignations dependent on conditions being satisfied. For example, there is suggestion that the WNV case fatality rate differs between the Eastern part of the United States and the Western part, probably due to a difference in the mosquito vector species responsible for transmission in different parts of the country. We can use our variable `Longitude` (the longitude of the state centroid) to study this pattern.
+
+## Using the longitude value -100 as an esimtate of the dividing line between east and west, add a column called "EW" that contains "E" for counties located east of this line (i.e. Longitude > -100) and "W" otherwise. Note this will use the `if_else` function. Once you've done this create a density plot of cfr ("geom_density", a smoothed version of a histogram) filled according to east or west. Note, as well as supplying aesthetics to geom_density, you can add "alpha=0.3" so that colors are semi-transparent, allowing you to clearly see the density for east and west (this part does not go with the aesthetics, because it does not map to data).
+
+
+```{r cfrDens-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+wnv <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/wnv.csv")
+wnv %<>% mutate(cfr=Fatal/Total)
+```
+
+```{r cfrDens, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+```{r cfrDens-solution, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+wnv %<>% mutate(EW=if_else(Longitude>-100,"E","W"))
+wnv %>% ggplot(.) + geom_density(aes(x=cfr,fill=EW),alpha=0.3)
+```
+
+```{r cfrDens-hint-1}
+wnv %<>% mutate(EW=if_else(...))
+```
+
+```{r cfrDens-hint-2}
+wnv %<>% mutate(EW=if_else(Longitude>-100,"E","W"))
+```
+
+```{r cfrDens-hint-3}
+wnv %<>% mutate(EW=if_else(Longitude>-100,"E","W"))
+wnv %>% ggplot(.) + geom_density(...)
+```
+
