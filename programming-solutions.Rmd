@@ -15,16 +15,18 @@ library(learnr)
 
 ## Learning outcomes
 
-1. Writing scripts
+1. Using conditional statements to filter data
 
-2. Writing functions
+2. Writing loops
 
 3. Writing loops
 
 
 ## Introduction
 
-This exercise is about writing *scripts*, purpose-built computer programs for performing some analysis. Our scripts will be written using the *RStudio Editor* and compiled using Rstudio. In this exercise we review many basic numerical operations and R functions, programming style, the development of custom functions, pipes, flow of control and loops.
+This exercise is about writing *scripts*, purpose-built computer programs for performing some analysis. Our scripts will be written using the *RStudio Editor* and compiled using Rstudio. In this exercise we review many basic numerical operations and R functions, programming style, the development of custom functions, pipes, flow of control and loops. If you're relatively new to programming, you may find it helpful to first review this short video.
+
+![](https://youtu.be/qAwK1fxgBsE)
 
 ## Data
 
@@ -32,20 +34,22 @@ West Nile virus (WNV) is a positive-sense single-stranded RNA virus transmitted 
 
 ## Recap on manipulation and visualization
 
-As is customary with our style of coding, first, load the tidyverse and magrittr libraries, then read in the data from "https://raw.githubusercontent.com/awpark/learnR/master/wnv.csv" as data frame "mers" and create a histogram of the number of cases (just as represented in the "Total" column, which is a case count per state per year).
+As is customary with our style of coding, first, load the tidyverse and magrittr libraries, then read in the data from <https://raw.githubusercontent.com/awpark/learnR/master/wnv.csv> as data frame "wnv" and create a histogram of the number of cases (just as represented in the "Total" column, which is a case count per state per year).
 
-```{r inspectData1, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```{r inspectData, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
 
 ```
 
-```{r inspectData1-solution, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```{r inspectData-solution}
 library(tidyverse)
 library(magrittr)
-wnv <- read_csv('wnv.csv')#change URL once uploaded to github
+wnv <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/wnv.csv")
 wnv %>% ggplot(.) + 
   geom_histogram(aes(x=Total)) + 
-  labs(x='Cases', y='Frequency',
-       title='Number of cases in each state/year', caption="Data from: https://diseasemaps.usgs.gov/")
+  labs(x="Cases", y="Frequency",
+       title="Number of cases in each state/year", caption="Data from: https://diseasemaps.usgs.gov/")
 ```
 
 
@@ -57,24 +61,36 @@ library(magrittr)
 wnv <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/wnv.csv")
 ```
 
-```{r caclCfr, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```{r calcCfr, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
 
 ```
 
 
-```{r calcCfr-solution, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+```{r calcCfr-solution}
 wnv %<>% mutate(cfr=Fatal/Total)
 wnv %>% ggplot(.) + 
   geom_histogram(aes(x=cfr,fill=as.factor(Year))) + 
-  labs(x='Cases', y='Frequency',
-       title='Case fatality rate', caption="Data from: https://diseasemaps.usgs.gov/")
+  labs(x="Cases", y="Frequency",
+       title="Case fatality rate", caption="Data from: https://diseasemaps.usgs.gov/")
+```
+
+```{r calcCfr-hint-1}
+wnv %<>% mutate(cfr=...)
+```
+
+
+```{r calcCfr-hint-2}
+wnv %<>% mutate(cfr=Fatal/Total)
+wnv %>% ggplot(.) +
+  geom_histogram(...) 
 ```
 
 ## Conditional statements
 
 Often we want to make calculations or assignations dependent on conditions being satisfied. For example, there is suggestion that the WNV case fatality rate differs between the Eastern part of the United States and the Western part, probably due to a difference in the mosquito vector species responsible for transmission in different parts of the country. We can use our variable `Longitude` (the longitude of the state centroid) to study this pattern.
 
-## Using the longitude value -100 as an esimtate of the dividing line between east and west, add a column called "EW" that contains "E" for counties located east of this line (i.e. Longitude > -100) and "W" otherwise. Note this will use the `if_else` function. Once you've done this create a density plot of cfr ("geom_density", a smoothed version of a histogram) filled according to east or west. Note, as well as supplying aesthetics to geom_density, you can add "alpha=0.3" so that colors are semi-transparent, allowing you to clearly see the density for east and west (this part does not go with the aesthetics, because it does not map to data).
+Using the longitude value -100 as an esimtate of the dividing line between east and west, add a column called "EW" that contains "E" for counties located east of this line (i.e. Longitude > -100) and "W" otherwise. Note this will use the `if_else` function. Once you've done this create a density plot of cfr ("geom_density", a smoothed version of a histogram) filled according to east or west. Note, as well as supplying aesthetics to geom_density, you can add "alpha=0.3" so that colors are semi-transparent, allowing you to clearly see the density for east and west (this part does not go with the aesthetics, because it does not map to data).
 
 
 ```{r cfrDens-setup, echo=FALSE, message=F, warning=FALSE}
@@ -88,7 +104,7 @@ wnv %<>% mutate(cfr=Fatal/Total)
 
 ```
 
-```{r cfrDens-solution, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+```{r cfrDens-solution}
 wnv %<>% mutate(EW=if_else(Longitude>-100,"E","W"))
 wnv %>% ggplot(.) + geom_density(aes(x=cfr,fill=EW),alpha=0.3)
 ```
@@ -104,5 +120,161 @@ wnv %<>% mutate(EW=if_else(Longitude>-100,"E","W"))
 ```{r cfrDens-hint-3}
 wnv %<>% mutate(EW=if_else(Longitude>-100,"E","W"))
 wnv %>% ggplot(.) + geom_density(...)
+```
+
+
+## Loops
+
+As you learn more tidy R methods, you'll find you rely on loops less. However, they can still be useful when we are iterating our data in a repetitive way. Here's a simple example where we loop through each year (1999-2007) and count how many states had at least one case of WNV. Run the code to see what it does.
+
+```{r loopEx-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+wnv <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/wnv.csv")
+wnv %<>% mutate(cfr=Fatal/Total)
+wnv %<>% mutate(EW=if_else(Longitude>-100,"E","W"))
+```
+
+
+```{r loopEx, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+for (i in 1999:2007){
+  print(paste("year: ",i))
+  n <- wnv %>% filter(Year==i) %>% select(State) %>% distinct() %>% nrow()
+  print(paste(n, " states reporting"))
+}
+```
+
+
+Using the example above as a guide, write a loop that prints the number of fatal cases each year
+
+```{r sumFatal-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+wnv <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/wnv.csv")
+wnv %<>% mutate(cfr=Fatal/Total)
+wnv %<>% mutate(EW=if_else(Longitude>-100,"E","W"))
+```
+
+
+```{r sumFatal, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+
+```{r sumFatal-solution}
+for (i in 1999:2007){
+  print(paste("year: ",i))
+  n <- wnv %>% filter(Year==i) %>% select(Fatal) %>% sum()
+  print(paste(n, " fatal cases"))
+}
+```
+
+
+## Functions
+
+While R has many built in functions (think of sum, mean, print etc.) we may wish to create our own function. In this example, we write a function to characterize each state-year combination in terms of the ratio of severe cases to regular cases, where severe is arbitrarily defined as neuroinvasive cases (i.e. the "EncephMen" column which represents cases that develop to encephalitis or meningitis). 
+
+
+```{r}
+sevRegRatio <- function(df){
+  # returns the ratio of cases in each state-year combination that are neuroinvasive:regular
+  # input = data frame with same structure as wnv data frame
+  # output = data frame with 3 columns: state, year, ratio
+  newDf <- NULL
+  for (i in 1:dim(df)[1]){
+    Ratio <- (df$EncephMen[i])/(df$Total[i]-df$EncephMen[i])
+    newDf <- rbind(newDf,c(df$State[i],df$Year[i],Ratio))
+  }
+  newDf %<>% as.data.frame(.)
+  names(newDf) <- c("State","Year","Ratio")
+  newDf %<>% mutate(Ratio=as.numeric(Ratio))
+  return(newDf)
+}
+```
+
+
+You can check this function works by creating an object (say, x) that is the return of the function `sevRegRatio` when you supply data frame "wnv". Check this works by creating x and inspecting it using the `head` function. 
+
+```{r checkFn-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+wnv <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/wnv.csv")
+wnv %<>% mutate(cfr=Fatal/Total)
+wnv %<>% mutate(EW=if_else(Longitude>-100,"E","W"))
+sevRegRatio <- function(df){
+  # returns the ratio of cases in each state-year combination that are neuroinvasive:regular
+  # input = data frame with same structure as wnv data frame
+  # output = data frame with 3 columns: state, year, ratio
+  newDf <- NULL
+  for (i in 1:dim(df)[1]){
+    Ratio <- (df$EncephMen[i])/(df$Total[i]-df$EncephMen[i])
+    newDf <- rbind(newDf,c(df$State[i],df$Year[i],Ratio))
+  }
+  newDf %<>% as.data.frame(.)
+  names(newDf) <- c("State","Year","Ratio")
+  newDf %<>% mutate(Ratio=as.numeric(Ratio))
+  return(newDf)
+}
+```
+
+
+```{r checkFn, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+
+```{r checkFn-solution}
+x <- sevRegRatio(wnv)
+head(x)
+```
+
+You'll see that some entries have "Inf" for the ratio. This stands for infinity and is caused when all $n$ cases are severe, because the ratio becomes $n/0$ which is infinity. In the code chunk below, paste the function and the creation/inspection of x (i.e. paste the contents of the two code chunks above into the empty one below). Now try to edit the function so that it won't write out the rows where the ratio is infinity. You can achieve this using an `if` statement. Remember, you can get help using the solution button. Good luck and great job!
+
+
+```{r editFn-setup, echo=FALSE, message=F, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+wnv <- read_csv("https://raw.githubusercontent.com/awpark/learnR/master/wnv.csv")
+wnv %<>% mutate(cfr=Fatal/Total)
+wnv %<>% mutate(EW=if_else(Longitude>-100,"E","W"))
+sevRegRatio <- function(df){
+  # returns the ratio of cases in each state-year combination that are neuroinvasive:regular
+  # input = data frame with same structure as wnv data frame
+  # output = data frame with 3 columns: state, year, ratio
+  newDf <- NULL
+  for (i in 1:dim(df)[1]){
+    Ratio <- (df$EncephMen[i])/(df$Total[i]-df$EncephMen[i])
+    newDf <- rbind(newDf,c(df$State[i],df$Year[i],Ratio))
+  }
+  newDf %<>% as.data.frame(.)
+  names(newDf) <- c("State","Year","Ratio")
+  newDf %<>% mutate(Ratio=as.numeric(Ratio))
+  return(newDf)
+}
+```
+
+```{r editFn, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+
+```{r editFn-solution}
+sevRegRatio <- function(df){
+  # returns the ratio of cases in each state-year combination that are neuroinvasive:regular
+  # input = data frame with same structure as wnv data frame
+  # output = data frame with 3 columns: state, year, ratio
+  newDf <- NULL
+  for (i in 1:dim(df)[1]){
+    Ratio <- (df$EncephMen[i])/(df$Total[i]-df$EncephMen[i])
+    if (Ratio != Inf){newDf <- rbind(newDf,c(df$State[i],df$Year[i],Ratio))}
+  }
+  newDf %<>% as.data.frame(.)
+  names(newDf) <- c("State","Year","Ratio")
+  newDf %<>% mutate(Ratio=as.numeric(Ratio))
+  return(newDf)
+}
+
+x <- sevRegRatio(wnv)
+head(x)
 ```
 
