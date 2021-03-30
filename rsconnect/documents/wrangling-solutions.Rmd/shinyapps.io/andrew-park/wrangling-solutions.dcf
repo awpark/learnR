@@ -5,8 +5,9 @@ account: andrew-park
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 2354795
-bundleId: 3413113
+bundleId: 4140494
 url: https://andrew-park.shinyapps.io/wrangling-solutions/
-when: 1595265865.92305
+when: 1611586005.03859
 asMultiple: FALSE
 asStatic: FALSE
+ignoredFiles: ~$visualization_audio.pptx|cases.csv|climate.csv|ld_final.csv|ld10_11.csv|ld12_13.csv|ld7-8.csv|ld8-9.csv|ld9_10.csv|ldPop.csv|ldPopClim.csv|ldPopClimLog.csv|lpc100.csv|lyme.csv|modeling-solutions.html|modeling-solutions.Rmd|pop_final.csv|pop.csv|pop2.csv|pop3_4.csv|pop4_5.csv|pop5_6.csv|popCopyOfOriginal.csv|popGA.csv|programming-solutions.html|programming-solutions.Rmd|streamlinePop.R|visualization-solutions.html|visualization-solutions.Rmd|wnv.csv|wrangling-solutions.html|programming-solutions_files/figure-html/calcCfr-solution-1.png|visualization-solutions_files/figure-html/epiCurve-1.png|visualization-solutions_files/figure-html/epiCurveByCountry-1.png|visualization-solutions_files/figure-html/facet-1.png|visualization-solutions_files/figure-html/histoIP-1.png|visualization-solutions_files/figure-html/IPvsTime-1.png

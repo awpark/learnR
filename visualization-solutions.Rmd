@@ -29,9 +29,14 @@ library(learnr)
 
 7. Create panels automatically with faceting
 
+
 ## Introduction
 
-This is the first in a series of modules that constitute *Introduction to Scientific Programming*, taught through the IDEAS PhD program at the University of Georgia's Odum School of Ecology in conjunction with the Center for the Ecology of Infectious Diseases. This module introduces the principles and practice of data visualization with special emphasis on analysis of infectious disease data. Programming is performed in R. Recommended reading for this module is the book *R for Data Science* by Hadley Wickham and Garret Grolemund (O'Reilly Media, 2017).
+![](images/IDEAS_logo.jpg){width=50%}
+
+This is the first in a series of modules that constitute *Introduction to Scientific Programming*, taught through the IDEAS PhD program at the University of Georgia's Odum School of Ecology in conjunction with the Center for the Ecology of Infectious Diseases. Content was created by John M. Drake and Andrew W. Park, with the self-study version coded by Andrew W. Park. Development of this module was supported by the Interdisciplinary Disease Ecology Across Scales (IDEAS) graduate training program under NSF grant number: DGE-1545433.
+
+This module introduces the principles and practice of data visualization with special emphasis on analysis of infectious disease data. Programming is performed in R. Recommended reading for this module is the book *R for Data Science* by Hadley Wickham and Garret Grolemund (O'Reilly Media, 2017).
 
 Specifically, this module seeks to introduce the student to basic tasks and operations required to visualize data in R using the package `ggplot2`. *Data visualization* is a key component of *exploratory data analysis*. `ggplot2` implements the idea that there is a "grammar of graphics" -- that is an organizational scheme based on the semantic relationships among different graphical elements. Data visualization theory, practice, and exploratory data analysis are not covered systematically, but rather by example, with the expectation that students will develop further skills by extending the provided examples.
 
