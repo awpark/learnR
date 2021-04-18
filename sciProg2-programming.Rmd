@@ -24,7 +24,13 @@ library(learnr)
 
 ## Introduction
 
-This exercise is about writing *scripts*, purpose-built computer programs for performing some analysis. Our scripts will be written using the *RStudio Editor* and compiled using Rstudio. In this exercise we review many basic numerical operations and R functions, programming style, the development of custom functions, pipes, flow of control and loops. If you're relatively new to programming, you may find it helpful to first review this short video.
+![](images/IDEAS_logo.jpg){width=50%}
+
+This is the second in a series of modules that constitute *Introduction to Scientific Programming*, taught through the IDEAS PhD program at the University of Georgia's Odum School of Ecology in conjunction with the Center for the Ecology of Infectious Diseases. Content was created by John M. Drake and Andrew W. Park, with the self-study version coded by Andrew W. Park. Development of this module was supported by the Interdisciplinary Disease Ecology Across Scales (IDEAS) graduate training program under NSF grant number: DGE-1545433.
+
+This module introduces the principles and practice of programming with special emphasis on analysis of infectious disease data. Programming is performed in R. Recommended reading for this module is the book *R for Data Science* by Hadley Wickham and Garret Grolemund (O'Reilly Media, 2017).
+
+In the exercises that follow, we review many basic numerical operations and R functions, programming style, the development of custom functions, pipes, flow of control and loops. If you're relatively new to programming, you may find it helpful to first review this short video.
 
 ![](https://youtu.be/qAwK1fxgBsE)
 
@@ -34,7 +40,7 @@ West Nile virus (WNV) is a positive-sense single-stranded RNA virus transmitted 
 
 ## Recap on manipulation and visualization
 
-As is customary with our style of coding, first, load the tidyverse and magrittr libraries, then read in the data from <https://raw.githubusercontent.com/awpark/learnR/master/wnv.csv> as data frame "wnv" and create a histogram of the number of cases (just as represented in the "Total" column, which is a case count per state per year).
+*Task 1: As is customary with our style of coding, first, load the tidyverse and magrittr libraries, then read in the data from <https://raw.githubusercontent.com/awpark/learnR/master/wnv.csv> as data frame "wnv" and create a histogram of the number of cases (just as represented in the "Total" column, which is a case count per state per year).*
 
 
 ```{r inspectData, exercise=TRUE, exercise.eval=FALSE, message=FALSE, warning=FALSE}
@@ -53,7 +59,7 @@ wnv %>% ggplot(.) +
 ```
 
 
-Next, create a new column called "cfr" which will represent the case fatality rate (proportion of infected individuals that die as a result of infection). This will make use of the function `mutate` and a manipulation of the columns "Fatal" and "Total". Next, create a histogram of these new case fatality rate values and color the proportion of each bin by the year in which they occur. Note this uses the "fill" aesthetic and because the "Year" column contains numeric data, you will need to fill using "as.factor(Year)". 
+*Task 2: Next, create a new column called "cfr" which will represent the case fatality rate (proportion of infected individuals that die as a result of infection). This will make use of the function `mutate` and a manipulation of the columns "Fatal" and "Total". After this, create a histogram of these new case fatality rate values and color the proportion of each bin by the year in which they occur. Note this uses the "fill" aesthetic and because the "Year" column contains numeric data, you will need to fill using "as.factor(Year)".* 
 
 ```{r calcCfr-setup, echo=FALSE, message=F, warning=FALSE}
 library(tidyverse)
@@ -90,7 +96,7 @@ wnv %>% ggplot(.) +
 
 Often we want to make calculations or assignations dependent on conditions being satisfied. For example, there is suggestion that the WNV case fatality rate differs between the Eastern part of the United States and the Western part, probably due to a difference in the mosquito vector species responsible for transmission in different parts of the country. We can use our variable `Longitude` (the longitude of the state centroid) to study this pattern.
 
-Using the longitude value -100 as an esimtate of the dividing line between east and west, add a column called "EW" that contains "E" for counties located east of this line (i.e. Longitude > -100) and "W" otherwise. Note this will use the `if_else` function. Once you've done this create a density plot of cfr ("geom_density", a smoothed version of a histogram) filled according to east or west. Note, as well as supplying aesthetics to geom_density, you can add "alpha=0.3" so that colors are semi-transparent, allowing you to clearly see the density for east and west (this part does not go with the aesthetics, because it does not map to data).
+*Task 3: Using the longitude value -100 as an estimate of the dividing line between east and west, add a column called "EW" that contains "E" for counties located east of this line (i.e. Longitude > -100) and "W" otherwise. Note this will use the `if_else` function. Once you've done this create a density plot of cfr ("geom_density", a smoothed version of a histogram) filled according to east or west. Note, as well as supplying aesthetics to geom_density, you can add "alpha=0.3" so that colors are semi-transparent, allowing you to clearly see the density for east and west (this part does not go with the aesthetics, because it does not map to data).*
 
 
 ```{r cfrDens-setup, echo=FALSE, message=F, warning=FALSE}
@@ -125,7 +131,9 @@ wnv %>% ggplot(.) + geom_density(...)
 
 ## Loops
 
-As you learn more tidy R methods, you'll find you rely on loops less. However, they can still be useful when we are iterating our data in a repetitive way. Here's a simple example where we loop through each year (1999-2007) and count how many states had at least one case of WNV. Run the code to see what it does.
+As you learn more tidy R methods, you'll find you rely on loops less. However, they can still be useful when we are iterating our data in a repetitive way. Here's a simple example where we loop through each year (1999-2007) and count how many states had at least one case of WNV. 
+
+*Task 4: Run the code to see what it does.*
 
 ```{r loopEx-setup, echo=FALSE, message=F, warning=FALSE}
 library(tidyverse)
@@ -145,7 +153,7 @@ for (i in 1999:2007){
 ```
 
 
-Using the example above as a guide, write a loop that prints the number of fatal cases each year
+*Task 5: Using the example above as a guide, write a loop that prints the number of fatal cases each year.*
 
 ```{r sumFatal-setup, echo=FALSE, message=F, warning=FALSE}
 library(tidyverse)
@@ -193,7 +201,9 @@ sevRegRatio <- function(df){
 ```
 
 
-You can check this function works by creating an object (say, x) that is the return of the function `sevRegRatio` when you supply data frame "wnv". Check this works by creating x and inspecting it using the `head` function. 
+You can check this function works by creating an object (say, x) that is the return of the function `sevRegRatio` when you supply data frame "wnv". 
+
+*Task 6: Check this works by creating x and inspecting it using the `head` function.*
 
 ```{r checkFn-setup, echo=FALSE, message=F, warning=FALSE}
 library(tidyverse)
@@ -228,7 +238,9 @@ x <- sevRegRatio(wnv)
 head(x)
 ```
 
-You'll see that some entries have "Inf" for the ratio. This stands for infinity and is caused when all $n$ cases are severe, because the ratio becomes $n/0$ which is infinity. In the code chunk below, paste the function and the creation/inspection of x (i.e. paste the contents of the two code chunks above into the empty one below). Now try to edit the function so that it won't write out the rows where the ratio is infinity. You can achieve this using an `if` statement. Remember, you can get help using the solution button. Good luck and great job!
+You'll see that some entries have "Inf" for the ratio. This stands for infinity and is caused when all $n$ cases are severe, because the ratio becomes $n/0$ which is infinity. 
+
+*Task 7: In the code chunk below, paste the function and the creation/inspection of x (i.e. paste the contents of the two code chunks above into the empty one below). Now try to edit the function so that it won't write out the rows where the ratio is infinity. You can achieve this using an `if` statement. Remember, you can get help using the solution button. Good luck and great job!*
 
 
 ```{r editFn-setup, echo=FALSE, message=F, warning=FALSE}

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="author" content="Andrew W. Park" />
+
+
+<meta name="progressive" content="true" />
+<meta name="allow-skip" content="true" />
+
+<title>Programing</title>
+
+
+<!-- highlightjs -->
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+<!-- taken from https://github.com/rstudio/rmarkdown/blob/67b7f5fc779e4cfdfd0f021d3d7745b6b6e17149/inst/rmd/h/default.html#L296-L362 -->
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("section-TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+<!-- end tabsets -->
+
+
+
+</head>
+
+<body>
+
+
+
+<div class="pageContent band">
+<div class="bandContent page">
+
+<div class="topics">
+
+<div id="section-learning-outcomes" class="section level2">
+<h2>Learning outcomes</h2>
+<ol style="list-style-type: decimal">
+<li><p>Using conditional statements to filter data</p></li>
+<li><p>Writing loops</p></li>
+<li><p>Writing loops</p></li>
+</ol>
+</div>
+<div id="section-introduction" class="section level2">
+<h2>Introduction</h2>
+<p><img src="images/IDEAS_logo.jpg" style="width:50.0%" /></p>
+<p>This is the second in a series of modules that constitute <em>Introduction to Scientific Programming</em>, taught through the IDEAS PhD program at the University of Georgia’s Odum School of Ecology in conjunction with the Center for the Ecology of Infectious Diseases. Content was created by John M. Drake and Andrew W. Park, with the self-study version coded by Andrew W. Park. Development of this module was supported by the Interdisciplinary Disease Ecology Across Scales (IDEAS) graduate training program under NSF grant number: DGE-1545433.</p>
+<p>This module introduces the principles and practice of programming with special emphasis on analysis of infectious disease data. Programming is performed in R. Recommended reading for this module is the book <em>R for Data Science</em> by Hadley Wickham and Garret Grolemund (O’Reilly Media, 2017).</p>
+<p>In the exercises that follow, we review many basic numerical operations and R functions, programming style, the development of custom functions, pipes, flow of control and loops. If you’re relatively new to programming, you may find it helpful to first review this short video.</p>
+<p><img src="https://youtu.be/qAwK1fxgBsE" /></p>
+</div>
+<div id="section-data" class="section level2">
+<h2>Data</h2>
+<p>West Nile virus (WNV) is a positive-sense single-stranded RNA virus transmitted by mosquitoes to a range of vertebrate hosts. WNV was first identified in Uganda in 1937 and found in parts of Europe, Asia, and Australia during the 1950s and 1960s. In 1999, WNV was first reported in the Americas in association with dieoffs of captive and wild birds. This outbreak initiated widespread epidemic that swept across North America and is now spreading in Central and South America. Humans are “dead end” hosts (humans do not achieve sufficiently high viremia to be infectious to mosquitoes). The majority of human cases are asymptomatic, but a small fraction of cases result in meningitis, encephalitis, and/or death. State-level data on the number of reported cases, meningitis/encephalitis, and fatalities are compiled and reported by the CDC and US Geological survey at <a href="https://diseasemaps.usgs.gov/" class="uri">https://diseasemaps.usgs.gov/</a>. The file <code>wnv.csv</code> contains tabular data on the number of reported cases (mostly febrile cases), neuroinvasive cases (meningitis/encephalitis), and fatalities for all continental US states from 1999-2007. Additional data are the latitude and longitude of the centroid of each state.</p>
+</div>
+<div id="section-recap-on-manipulation-and-visualization" class="section level2">
+<h2>Recap on manipulation and visualization</h2>
+<p><em>Task 1: As is customary with our style of coding, first, load the tidyverse and magrittr libraries, then read in the data from <a href="https://raw.githubusercontent.com/awpark/learnR/master/wnv.csv" class="uri">https://raw.githubusercontent.com/awpark/learnR/master/wnv.csv</a> as data frame “wnv” and create a histogram of the number of cases (just as represented in the “Total” column, which is a case count per state per year).</em></p>
+<div class="tutorial-exercise" data-label="inspectData" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":false,"error":false,"message":false,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
+</div>
+<div class="tutorial-exercise-support" data-label="inspectData-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>library(tidyverse)
+library(magrittr)
+wnv &lt;- read_csv(&quot;https://raw.githubusercontent.com/awpark/learnR/master/wnv.csv&quot;)
+wnv %&gt;% ggplot(.) + 
+  geom_histogram(aes(x=Total)) + 
+  labs(x=&quot;Cases&quot;, y=&quot;Frequency&quot;,
+       title=&quot;Number of cases in each state/year&quot;, caption=&quot;Data from: https://diseasemaps.usgs.gov/&quot;)</code></pre>
+</div>
+<p><em>Task 2: Next, create a new column called “cfr” which will represent the case fatality rate (proportion of infected individuals that die as a result of infection). This will make use of the function <code>mutate</code> and a manipulation of the columns “Fatal” and “Total”. After this, create a histogram of these new case fatality rate values and color the proportion of each bin by the year in which they occur. Note this uses the “fill” aesthetic and because the “Year” column contains numeric data, you will need to fill using “as.factor(Year)”.</em></p>
+<div class="tutorial-exercise-support" data-label="calcCfr-setup" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>library(tidyverse)
+library(magrittr)
+wnv &lt;- read_csv(&quot;https://raw.githubusercontent.com/awpark/learnR/master/wnv.csv&quot;)</code></pre>
+</div>
+<div class="tutorial-exercise" data-label="calcCfr" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":false,"error":false,"message":false,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
+</div>
+<div class="tutorial-exercise-support" data-label="calcCfr-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>wnv %&lt;&gt;% mutate(cfr=Fatal/Total)
+wnv %&gt;% ggplot(.) + 
+  geom_histogram(aes(x=cfr,fill=as.factor(Year))) + 
+  labs(x=&quot;Cases&quot;, y=&quot;Frequency&quot;,
+       title=&quot;Case fatality rate&quot;, caption=&quot;Data from: https://diseasemaps.usgs.gov/&quot;)</code></pre>
+</div>
+<div class="tutorial-exercise-support" data-label="calcCfr-hint-1" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>wnv %&lt;&gt;% mutate(cfr=...)</code></pre>
+</div>
+<div class="tutorial-exercise-support" data-label="calcCfr-hint-2" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>wnv %&lt;&gt;% mutate(cfr=Fatal/Total)
+wnv %&gt;% ggplot(.) +
+  geom_histogram(...) </code></pre>
+</div>
+</div>
+<div id="section-conditional-statements" class="section level2">
+<h2>Conditional statements</h2>
+<p>Often we want to make calculations or assignations dependent on conditions being satisfied. For example, there is suggestion that the WNV case fatality rate differs between the Eastern part of the United States and the Western part, probably due to a difference in the mosquito vector species responsible for transmission in different parts of the country. We can use our variable <code>Longitude</code> (the longitude of the state centroid) to study this pattern.</p>
+<p><em>Task 3: Using the longitude value -100 as an estimate of the dividing line between east and west, add a column called “EW” that contains “E” for counties located east of this line (i.e. Longitude &gt; -100) and “W” otherwise. Note this will use the <code>if_else</code> function. Once you’ve done this create a density plot of cfr (“geom_density”, a smoothed version of a histogram) filled according to east or west. Note, as well as supplying aesthetics to geom_density, you can add “alpha=0.3” so that colors are semi-transparent, allowing you to clearly see the density for east and west (this part does not go with the aesthetics, because it does not map to data).</em></p>
+<div class="tutorial-exercise-support" data-label="cfrDens-setup" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>library(tidyverse)
+library(magrittr)
+wnv &lt;- read_csv(&quot;https://raw.githubusercontent.com/awpark/learnR/master/wnv.csv&quot;)
+wnv %&lt;&gt;% mutate(cfr=Fatal/Total)</code></pre>
+</div>
+<div class="tutorial-exercise" data-label="cfrDens" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":false,"error":false,"message":false,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
+</div>
+<div class="tutorial-exercise-support" data-label="cfrDens-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>wnv %&lt;&gt;% mutate(EW=if_else(Longitude&gt;-100,&quot;E&quot;,&quot;W&quot;))
+wnv %&gt;% ggplot(.) + geom_density(aes(x=cfr,fill=EW),alpha=0.3)</code></pre>
+</div>
+<div class="tutorial-exercise-support" data-label="cfrDens-hint-1" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>wnv %&lt;&gt;% mutate(EW=if_else(...))</code></pre>
+</div>
+<div class="tutorial-exercise-support" data-label="cfrDens-hint-2" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>wnv %&lt;&gt;% mutate(EW=if_else(Longitude&gt;-100,&quot;E&quot;,&quot;W&quot;))</code></pre>
+</div>
+<div class="tutorial-exercise-support" data-label="cfrDens-hint-3" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>wnv %&lt;&gt;% mutate(EW=if_else(Longitude&gt;-100,&quot;E&quot;,&quot;W&quot;))
+wnv %&gt;% ggplot(.) + geom_density(...)</code></pre>
+</div>
+</div>
+<div id="section-loops" class="section level2">
+<h2>Loops</h2>
+<p>As you learn more tidy R methods, you’ll find you rely on loops less. However, they can still be useful when we are iterating our data in a repetitive way. Here’s a simple example where we loop through each year (1999-2007) and count how many states had at least one case of WNV.</p>
+<p><em>Task 4: Run the code to see what it does.</em></p>
+<div class="tutorial-exercise-support" data-label="loopEx-setup" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>library(tidyverse)
+library(magrittr)
+wnv &lt;- read_csv(&quot;https://raw.githubusercontent.com/awpark/learnR/master/wnv.csv&quot;)
+wnv %&lt;&gt;% mutate(cfr=Fatal/Total)
+wnv %&lt;&gt;% mutate(EW=if_else(Longitude&gt;-100,&quot;E&quot;,&quot;W&quot;))</code></pre>
+</div>
+<div class="tutorial-exercise" data-label="loopEx" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>for (i in 1999:2007){
+  print(paste(&quot;year: &quot;,i))
+  n &lt;- wnv %&gt;% filter(Year==i) %&gt;% select(State) %&gt;% distinct() %&gt;% nrow()
+  print(paste(n, &quot; states reporting&quot;))
+}</code></pre>
+<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":false,"error":false,"message":false,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
+</div>
+<p><em>Task 5: Using the example above as a guide, write a loop that prints the number of fatal cases each year.</em></p>
+<div class="tutorial-exercise-support" data-label="sumFatal-setup" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>library(tidyverse)
+library(magrittr)
+wnv &lt;- read_csv(&quot;https://raw.githubusercontent.com/awpark/learnR/master/wnv.csv&quot;)
+wnv %&lt;&gt;% mutate(cfr=Fatal/Total)
+wnv %&lt;&gt;% mutate(EW=if_else(Longitude&gt;-100,&quot;E&quot;,&quot;W&quot;))</code></pre>
+</div>
+<div class="tutorial-exercise" data-label="sumFatal" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":false,"error":false,"message":false,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
+</div>
+<div class="tutorial-exercise-support" data-label="sumFatal-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>for (i in 1999:2007){
+  print(paste(&quot;year: &quot;,i))
+  n &lt;- wnv %&gt;% filter(Year==i) %&gt;% select(Fatal) %&gt;% sum()
+  print(paste(n, &quot; fatal cases&quot;))
+}</code></pre>
+</div>
+</div>
+<div id="section-functions" class="section level2">
+<h2>Functions</h2>
+<p>While R has many built in functions (think of sum, mean, print etc.) we may wish to create our own function. In this example, we write a function to characterize each state-year combination in terms of the ratio of severe cases to regular cases, where severe is arbitrarily defined as neuroinvasive cases (i.e. the “EncephMen” column which represents cases that develop to encephalitis or meningitis).</p>
+<pre class="r"><code>sevRegRatio &lt;- function(df){
+  # returns the ratio of cases in each state-year combination that are neuroinvasive:regular
+  # input = data frame with same structure as wnv data frame
+  # output = data frame with 3 columns: state, year, ratio
+  newDf &lt;- NULL
+  for (i in 1:dim(df)[1]){
+    Ratio &lt;- (df$EncephMen[i])/(df$Total[i]-df$EncephMen[i])
+    newDf &lt;- rbind(newDf,c(df$State[i],df$Year[i],Ratio))
+  }
+  newDf %&lt;&gt;% as.data.frame(.)
+  names(newDf) &lt;- c(&quot;State&quot;,&quot;Year&quot;,&quot;Ratio&quot;)
+  newDf %&lt;&gt;% mutate(Ratio=as.numeric(Ratio))
+  return(newDf)
+}</code></pre>
+<p>You can check this function works by creating an object (say, x) that is the return of the function <code>sevRegRatio</code> when you supply data frame “wnv”.</p>
+<p><em>Task 6: Check this works by creating x and inspecting it using the <code>head</code> function.</em></p>
+<div class="tutorial-exercise-support" data-label="checkFn-setup" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>library(tidyverse)
+library(magrittr)
+wnv &lt;- read_csv(&quot;https://raw.githubusercontent.com/awpark/learnR/master/wnv.csv&quot;)
+wnv %&lt;&gt;% mutate(cfr=Fatal/Total)
+wnv %&lt;&gt;% mutate(EW=if_else(Longitude&gt;-100,&quot;E&quot;,&quot;W&quot;))
+sevRegRatio &lt;- function(df){
+  # returns the ratio of cases in each state-year combination that are neuroinvasive:regular
+  # input = data frame with same structure as wnv data frame
+  # output = data frame with 3 columns: state, year, ratio
+  newDf &lt;- NULL
+  for (i in 1:dim(df)[1]){
+    Ratio &lt;- (df$EncephMen[i])/(df$Total[i]-df$EncephMen[i])
+    newDf &lt;- rbind(newDf,c(df$State[i],df$Year[i],Ratio))
+  }
+  newDf %&lt;&gt;% as.data.frame(.)
+  names(newDf) &lt;- c(&quot;State&quot;,&quot;Year&quot;,&quot;Ratio&quot;)
+  newDf %&lt;&gt;% mutate(Ratio=as.numeric(Ratio))
+  return(newDf)
+}</code></pre>
+</div>
+<div class="tutorial-exercise" data-label="checkFn" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":false,"error":false,"message":false,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
+</div>
+<div class="tutorial-exercise-support" data-label="checkFn-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>x &lt;- sevRegRatio(wnv)
+head(x)</code></pre>
+</div>
+<p>You’ll see that some entries have “Inf” for the ratio. This stands for infinity and is caused when all <span class="math inline">\(n\)</span> cases are severe, because the ratio becomes <span class="math inline">\(n/0\)</span> which is infinity.</p>
+<p><em>Task 7: In the code chunk below, paste the function and the creation/inspection of x (i.e. paste the contents of the two code chunks above into the empty one below). Now try to edit the function so that it won’t write out the rows where the ratio is infinity. You can achieve this using an <code>if</code> statement. Remember, you can get help using the solution button. Good luck and great job!</em></p>
+<div class="tutorial-exercise-support" data-label="editFn-setup" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>library(tidyverse)
+library(magrittr)
+wnv &lt;- read_csv(&quot;https://raw.githubusercontent.com/awpark/learnR/master/wnv.csv&quot;)
+wnv %&lt;&gt;% mutate(cfr=Fatal/Total)
+wnv %&lt;&gt;% mutate(EW=if_else(Longitude&gt;-100,&quot;E&quot;,&quot;W&quot;))
+sevRegRatio &lt;- function(df){
+  # returns the ratio of cases in each state-year combination that are neuroinvasive:regular
+  # input = data frame with same structure as wnv data frame
+  # output = data frame with 3 columns: state, year, ratio
+  newDf &lt;- NULL
+  for (i in 1:dim(df)[1]){
+    Ratio &lt;- (df$EncephMen[i])/(df$Total[i]-df$EncephMen[i])
+    newDf &lt;- rbind(newDf,c(df$State[i],df$Year[i],Ratio))
+  }
+  newDf %&lt;&gt;% as.data.frame(.)
+  names(newDf) &lt;- c(&quot;State&quot;,&quot;Year&quot;,&quot;Ratio&quot;)
+  newDf %&lt;&gt;% mutate(Ratio=as.numeric(Ratio))
+  return(newDf)
+}</code></pre>
+</div>
+<div class="tutorial-exercise" data-label="editFn" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":false,"error":false,"message":false,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
+</div>
+<div class="tutorial-exercise-support" data-label="editFn-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>sevRegRatio &lt;- function(df){
+  # returns the ratio of cases in each state-year combination that are neuroinvasive:regular
+  # input = data frame with same structure as wnv data frame
+  # output = data frame with 3 columns: state, year, ratio
+  newDf &lt;- NULL
+  for (i in 1:dim(df)[1]){
+    Ratio &lt;- (df$EncephMen[i])/(df$Total[i]-df$EncephMen[i])
+    if (Ratio != Inf){newDf &lt;- rbind(newDf,c(df$State[i],df$Year[i],Ratio))}
+  }
+  newDf %&lt;&gt;% as.data.frame(.)
+  names(newDf) &lt;- c(&quot;State&quot;,&quot;Year&quot;,&quot;Ratio&quot;)
+  newDf %&lt;&gt;% mutate(Ratio=as.numeric(Ratio))
+  return(newDf)
+}
+
+x &lt;- sevRegRatio(wnv)
+head(x)</code></pre>
+</div>
+
+<script type="application/shiny-prerendered" data-context="server-start">
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
+library(learnr)
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::register_http_handlers(session, metadata = NULL)
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+session$onSessionEnded(function() {
+        learnr:::session_stop_event(session)
+      })
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-inspectData-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-inspectData-code-editor`)), session)
+output$`tutorial-exercise-inspectData-output` <- renderUI({
+  `tutorial-exercise-inspectData-result`()
+})
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-calcCfr-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-calcCfr-code-editor`)), session)
+output$`tutorial-exercise-calcCfr-output` <- renderUI({
+  `tutorial-exercise-calcCfr-result`()
+})
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-cfrDens-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-cfrDens-code-editor`)), session)
+output$`tutorial-exercise-cfrDens-output` <- renderUI({
+  `tutorial-exercise-cfrDens-result`()
+})
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-loopEx-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-loopEx-code-editor`)), session)
+output$`tutorial-exercise-loopEx-output` <- renderUI({
+  `tutorial-exercise-loopEx-result`()
+})
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-sumFatal-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-sumFatal-code-editor`)), session)
+output$`tutorial-exercise-sumFatal-output` <- renderUI({
+  `tutorial-exercise-sumFatal-result`()
+})
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-checkFn-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-checkFn-code-editor`)), session)
+output$`tutorial-exercise-checkFn-output` <- renderUI({
+  `tutorial-exercise-checkFn-result`()
+})
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-editFn-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-editFn-code-editor`)), session)
+output$`tutorial-exercise-editFn-output` <- renderUI({
+  `tutorial-exercise-editFn-result`()
+})
+</script>
+ <!--html_preserve-->
+<script type="application/shiny-prerendered" data-context="dependencies">
+{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["header-attrs"]},{"type":"character","attributes":{},"value":["2.6"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/pandoc"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["header-attrs.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["2.6"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["jquery"]},{"type":"character","attributes":{},"value":["1.11.3"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/jquery"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["jquery.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["2.6"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["bootstrap"]},{"type":"character","attributes":{},"value":["3.3.5"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/bootstrap"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["viewport"]}},"value":[{"type":"character","attributes":{},"value":["width=device-width, initial-scale=1"]}]},{"type":"character","attributes":{},"value":["js/bootstrap.min.js","shim/html5shiv.min.js","shim/respond.min.js"]},{"type":"character","attributes":{},"value":["css/cerulean.min.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["2.6"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["pagedtable"]},{"type":"character","attributes":{},"value":["1.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/pagedtable-1.1"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["js/pagedtable.js"]},{"type":"character","attributes":{},"value":["css/pagedtable.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["2.6"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["highlightjs"]},{"type":"character","attributes":{},"value":["9.12.0"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/highlightjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["highlight.js"]},{"type":"character","attributes":{},"value":["textmate.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["2.6"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial"]},{"type":"character","attributes":{},"value":["0.10.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/tutorial"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial.js"]},{"type":"character","attributes":{},"value":["tutorial.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial-autocompletion"]},{"type":"character","attributes":{},"value":["0.10.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/tutorial"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial-autocompletion.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial-diagnostics"]},{"type":"character","attributes":{},"value":["0.10.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/tutorial"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial-diagnostics.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial-format"]},{"type":"character","attributes":{},"value":["0.10.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmarkdown/templates/tutorial/resources"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial-format.js"]},{"type":"character","attributes":{},"value":["tutorial-format.css","rstudio-theme.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["jquery"]},{"type":"character","attributes":{},"value":["1.11.3"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/jquery"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["jquery.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["2.6"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["navigation"]},{"type":"character","attributes":{},"value":["1.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/navigation-1.1"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tabsets.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["2.6"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["highlightjs"]},{"type":"character","attributes":{},"value":["9.12.0"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/highlightjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["highlight.js"]},{"type":"character","attributes":{},"value":["default.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["2.6"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["jquery"]},{"type":"character","attributes":{},"value":["1.11.3"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/jquery"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["jquery.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["2.6"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["font-awesome"]},{"type":"character","attributes":{},"value":["5.1.0"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/fontawesome"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["css/all.css","css/v4-shims.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["2.6"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["bootbox"]},{"type":"character","attributes":{},"value":["4.4.0"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/bootbox"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["bootbox.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["idb-keyvalue"]},{"type":"character","attributes":{},"value":["3.2.0"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/idb-keyval"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["idb-keyval-iife-compat.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[false]},{"type":"character","attributes":{},"value":["0.10.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial"]},{"type":"character","attributes":{},"value":["0.10.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/tutorial"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial.js"]},{"type":"character","attributes":{},"value":["tutorial.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial-autocompletion"]},{"type":"character","attributes":{},"value":["0.10.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/tutorial"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial-autocompletion.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial-diagnostics"]},{"type":"character","attributes":{},"value":["0.10.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/tutorial"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial-diagnostics.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.2.6"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["1.5.15"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.2.6"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["1.5.15"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.2.6"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["1.5.15"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.2.6"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["1.5.15"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.2.6"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["1.5.15"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.2.6"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["1.5.15"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.2.6"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["1.5.15"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.10.1"]}]}]}
+</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+<script type="application/shiny-prerendered" data-context="execution_dependencies">
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37]}},"value":[{"type":"character","attributes":{},"value":["base","compiler","datasets","digest","ellipsis","evaluate","fastmap","graphics","grDevices","htmltools","htmlwidgets","httpuv","jsonlite","knitr","later","learnr","lifecycle","magrittr","markdown","methods","mime","promises","R6","Rcpp","rlang","rmarkdown","rprojroot","shiny","stats","stringi","stringr","tools","utils","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["4.0.5","4.0.5","4.0.5","0.6.27","0.3.1","0.14","1.1.0","4.0.5","4.0.5","0.5.1.1","1.5.3","1.5.5","1.7.2","1.31","1.1.0.1","0.10.1","1.0.0","2.0.1","1.1","4.0.5","0.10","1.2.0.1","2.5.0","1.0.6","0.4.10","2.6","2.0.2","1.6.0","4.0.5","1.5.3","1.4.0","4.0.5","4.0.5","2.4.1","0.21","1.8-4","2.2.1"]}]}]}
+</script>
+<!--/html_preserve-->
+</div>
+
+</div> <!-- topics -->
+
+<div class="topicsContainer">
+<div class="topicsPositioner">
+<div class="band">
+<div class="bandContent topicsListContainer">
+
+<!-- begin doc-metadata -->
+<div id="doc-metadata">
+<h2 class="title toc-ignore" style="display:none;">Programing</h2>
+<h4 class="author"><em>Andrew W. Park</em></h4>
+</div>
+<!-- end doc-metadata -->
+
+</div> <!-- bandContent.topicsListContainer -->
+</div> <!-- band -->
+</div> <!-- topicsPositioner -->
+</div> <!-- topicsContainer -->
+
+
+</div> <!-- bandContent page -->
+</div> <!-- pageContent band -->
+
+
+
+
+<script>
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+</script>
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+
+</body>
+
+</html>
