@@ -1,0 +1,12 @@
+name: sciProg3-wrangling
+title: sciProg3-wrangling
+username:
+account: andrew-park
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3986850
+bundleId: 4486918
+url: https://andrew-park.shinyapps.io/sciProg3-wrangling/
+when: 1618757415.37368
+asMultiple: FALSE
+asStatic: FALSE

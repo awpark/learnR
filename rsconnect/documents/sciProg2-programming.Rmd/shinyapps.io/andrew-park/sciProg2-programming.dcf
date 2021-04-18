@@ -1,0 +1,12 @@
+name: sciProg2-programming
+title: sciProg2-programming
+username:
+account: andrew-park
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3986836
+bundleId: 4486906
+url: https://andrew-park.shinyapps.io/sciProg2-programming/
+when: 1618757213.35136
+asMultiple: FALSE
+asStatic: FALSE

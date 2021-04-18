@@ -1,0 +1,12 @@
+name: sciProg1-visualization
+title: sciProg1-visualization
+username:
+account: andrew-park
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3986821
+bundleId: 4486892
+url: https://andrew-park.shinyapps.io/sciProg1-visualization/
+when: 1618756963.49658
+asMultiple: FALSE
+asStatic: FALSE

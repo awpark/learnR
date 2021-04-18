@@ -1,0 +1,12 @@
+name: sciProg4-modeling
+title: sciProg4-modeling
+username:
+account: andrew-park
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3986869
+bundleId: 4486929
+url: https://andrew-park.shinyapps.io/sciProg4-modeling/
+when: 1618757599.58159
+asMultiple: FALSE
+asStatic: FALSE
