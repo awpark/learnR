@@ -1,12 +1,13 @@
-name: sciProg2-programming
-title: sciProg2-programming
+name: SciProg2-programming
+title: SciProg2-programming
 username:
 account: andrew-park
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
-appId: 3986836
-bundleId: 4486906
-url: https://andrew-park.shinyapps.io/sciProg2-programming/
-when: 1618757213.35136
+appId: 3987040
+bundleId: 4487051
+url: https://andrew-park.shinyapps.io/SciProg2-programming/
+when: 1618759936.67424
 asMultiple: FALSE
 asStatic: FALSE
+ignoredFiles: cases.csv|climate.csv|ld_final.csv|ld10_11.csv|ld12_13.csv|ld7-8.csv|ld8-9.csv|ld9_10.csv|ldPop.csv|ldPopClim.csv|ldPopClimLog.csv|lpc100.csv|lyme.csv|modeling-solutions.html|pop_final.csv|pop.csv|pop2.csv|pop3_4.csv|pop4_5.csv|pop5_6.csv|popCopyOfOriginal.csv|popGA.csv|programming-solutions.html|sciProg1-visualization.html|sciProg1-visualization.Rmd|sciProg2-programming.html|sciProg3-wrangling.html|sciProg3-wrangling.Rmd|sciProg4-modeling.html|sciProg4-modeling.Rmd|streamlinePop.R|visualization-solutions.html|wnv.csv|wrangling-solutions.html|programming-solutions_files/figure-html/calcCfr-solution-1.png|sciProg1-visualization_files/figure-html/epiCurve-1.png|sciProg1-visualization_files/figure-html/epiCurveByCountry-1.png|sciProg1-visualization_files/figure-html/facet-1.png|sciProg1-visualization_files/figure-html/histoIP-1.png|sciProg1-visualization_files/figure-html/IPvsTime-1.png|visualization-solutions_files/figure-html/epiCurve-1.png|visualization-solutions_files/figure-html/epiCurveByCountry-1.png|visualization-solutions_files/figure-html/facet-1.png|visualization-solutions_files/figure-html/histoIP-1.png|visualization-solutions_files/figure-html/IPvsTime-1.png
